@@ -24,7 +24,7 @@
   ```
 - Run using CompileDaemon:
   ```
-  CompileDaemon -command="./crackers"
+  CompileDaemon -command="./bphs"
   ```
 
 ---
