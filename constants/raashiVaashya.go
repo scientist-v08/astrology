@@ -1,0 +1,56 @@
+package constants
+
+var RaashiVaashyaMapStore = map[string]string{
+	"Mesha":     "Chatushpada",
+	"Vrushabha": "Chatushpada",
+	"Mithuna":   "Dwipada",
+	"Karkataka": "Jalachara",
+	"Simha":     "Vanachara",
+	"Kanya":     "Dwipada",
+	"Tula":      "Dwipada",
+	"Vruschika": "Keeta",
+	"Dhanassu1": "Dwipada",
+	"Dhanassu2": "Chatushpada",
+	"Makara1":   "Chatushpada",
+	"Makara2":   "Jalachara",
+	"Kumbha":    "Dwipada",
+	"Meena":     "Jalachara",
+}
+
+var VashyaCompatibility = map[string]map[string]int8{
+	"Dwipada": {
+		"Dwipada":     2,
+		"Chatushpada": 1,
+		"Jalachara":   1,
+		"Keeta":       1,
+		"Vanachara":   0,
+	},
+	"Chatushpada": {
+		"Dwipada":     1,
+		"Chatushpada": 2,
+		"Jalachara":   1,
+		"Keeta":       1,
+		"Vanachara":   1,
+	},
+	"Jalachara": {
+		"Dwipada":     1,
+		"Chatushpada": 1,
+		"Jalachara":   2,
+		"Keeta":       1,
+		"Vanachara":   1,
+	},
+	"Keeta": {
+		"Dwipada":     0,
+		"Chatushpada": 1,
+		"Jalachara":   1,
+		"Keeta":       2,
+		"Vanachara":   0,
+	},
+	"Vanachara": {
+		"Dwipada":     0,
+		"Chatushpada": 0,
+		"Jalachara":   1,
+		"Keeta":       0,
+		"Vanachara":   2,
+	},
+}
