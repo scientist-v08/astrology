@@ -26,6 +26,8 @@ func FirstHouseEffects(
 	doesAscendantLordHaveShukraAspect := constants.OppositeAspectsStore[models.AllRaashis((*reqBody).ShukraPlacement.Placement)] == ascendantLordHouse
 
 	// Start appending to string array for lagna placements
+	firstHouseEffects = append(firstHouseEffects, "The first house is strong and suggests that self-confidence, physical strength and glory (to the individual) is excellent")
+
 	if utils.IsDusthana(ascendantLordPlacement) || 
 	(ascendantLordPlacement == (*housePlacements)["Shani"] && ascendantLord != models.Raashyadhipati("Shani")) || 
 	(ascendantLordPlacement == (*housePlacements)["Kuja"] && ascendantLord != models.Raashyadhipati("Kuja")) || 

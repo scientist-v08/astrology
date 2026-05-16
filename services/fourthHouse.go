@@ -68,6 +68,8 @@ func FourthHouseEffects(
 	eleventhLord := constants.RaashyadhipatiMapStore[string(eleventhHouse)]
 	eleventhLordPlacement := (*housePlacements)[string(eleventhLord)]
 
+	fourthHouseEffects = append(fourthHouseEffects, "The fourth house is strong and suggests that domestic happiness, mother’s well-being, property, vehicles, and emotional peace are excellent.")
+
 	// Start appending
 	if (fourthLordPlacement == 4 || ascendantLordPlacement == 4) && isBeneficAspectOn4 {
 		fourthHouseEffects = append(fourthHouseEffects, "The native will enjoy full residential comforts")

@@ -62,6 +62,8 @@ func NinthHouseEffects(
 	isSunExalted := constants.SuryaUccha == sunNatalRaashi
 	isShukraExalted := constants.ShukraUccha == shukraNatalRaashi
 
+	ninthHouseEffects = append(ninthHouseEffects, "The ninth house is strong and suggests that luck, dharma, higher wisdom, father’s well-being, and long-distance travel are excellent")
+
 	// Start appending
 	ninthHouseEffects = append(ninthHouseEffects, "The ninth house is strong and indicates good fortune, strong belief system, and positive relations with father and gurus.")
 

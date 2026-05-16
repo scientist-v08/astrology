@@ -84,6 +84,8 @@ func TwelfthHouseEffects(
 	isTwelfthLordExalted := constants.ExaltationMapStore[twelfthLord] == twelfthLordNatalRaashi
 	isChandraExaltedOrInOwnRaashiOrOwnNavamsha := slices.Contains([]models.AllRaashis{constants.ChandraUccha, constants.Karkataka}, chandraNatalRaashi) || (*reqBody).NavChandraPlacement == string(constants.Karkataka)
 
+	twelfthHouseEffects = append(twelfthHouseEffects, "The twelfth house is strong and suggests that spiritual growth, foreign connections, charitable nature, and ultimate liberation (moksha) are very good")
+
 	// Start appending
 	twelfthHouseEffects = append(twelfthHouseEffects, "The 12th house themes will be prominant in the life of the native")
 

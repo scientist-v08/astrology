@@ -60,6 +60,8 @@ func SeventhHouseEffects(
 	secondLord := constants.RaashyadhipatiMapStore[string(secondHouse)]
 	secondLordPlacement := (*housePlacements)[string(secondLord)]
 
+	seventhHouseEffects = append(seventhHouseEffects, "The seventh house is strong and suggests that marital harmony, spouse’s support, business partnerships, and public dealings are excellent.")
+
 	// Start appending
 	if seventhLordPlacementNumber == 7 || constants.ExaltationMapStore[seventhLord] == seventhLordHousePlacementRaashi {
 		seventhHouseEffects = append(seventhHouseEffects, "The native will derive full happiness thorugh his wife and marriage")
