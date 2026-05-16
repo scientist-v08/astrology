@@ -28,6 +28,8 @@ func SecondHouseEffects(
 	eleventhLordPlacement := (*housePlacements)[string(eleventhLord)]
 	eleventhLordHouse := utils.GetHouseName((*reqBody).Ascendant, eleventhLordPlacement)
 
+	secondHouseEffects = append(secondHouseEffects, "The second house is strong and suggests that family harmony, accumulated wealth, speech, and financial stability are very good.")
+
 	// Start appending to the string array based on conditions
 	if secondLordPlacement == 2 || utils.IsKendra(secondLordPlacement) || utils.IsKendra(secondLordPlacement) {
 		secondHouseEffects = append(secondHouseEffects, "As the second lord is in 2/4/5/7/9/10, wealth will be promoted")

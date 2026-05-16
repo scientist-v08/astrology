@@ -139,6 +139,8 @@ func TenthHouseEffects(
 		((*housePlacements)["NavChandra"] == 10 && !(*reqBody).ChandraWaxing) ||
 		((*housePlacements)["NavBudha"] == 10 && !(reqBody).BudhaUnafflicted)
 
+	tenthHouseEffects = append(tenthHouseEffects, "The tenth house is strong and suggests that career growth, professional status, karma, and public recognition are very good")
+
 	// Start appending
 	tenthHouseEffects = append(tenthHouseEffects, "The native will see good results in 10th house themes")
 

@@ -53,7 +53,7 @@ func EighthHouseEffects(
 	saturnIsNotTheAscendantLord := ascendantLord != constants.Shani
 
 	// Start appending
-	eighthHouseEffects = append(eighthHouseEffects, "Although this house speaks about longevity it is better to calculate the lifespan using Nisargaayu, Ashmaayu and Pindaayu")
+	eighthHouseEffects = append(eighthHouseEffects, "The eighth house is strong and suggests that the native will be long lived, possess occult knowledge, have sudden gains, have good inheritance, and transformative power are very good")
 
 	if utils.IsKendra(eighthLordPlacementNumber) {
 		eighthHouseEffects = append(eighthHouseEffects, "The native will have a long life")

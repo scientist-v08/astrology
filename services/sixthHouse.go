@@ -70,6 +70,8 @@ func SixthHouseEffects(
 	ascendantLordPlacement := (*housePlacements)[string(ascendantLord)]
 	ascendantLordHouse := utils.GetHouseName((*reqBody).Ascendant, ascendantLordPlacement)
 
+	sixthHouseEffects = append(sixthHouseEffects, "The sixth house is strong and suggests that victory over enemies, debt management, health resilience, and service-oriented success are good")
+
 	if slices.Contains([]int16{1,6,8}, sixthLordPlacement) {
 		sixthHouseEffects = append(sixthHouseEffects, "The native will get ulcers or bruises on the body")
 	}

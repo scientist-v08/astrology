@@ -31,6 +31,8 @@ func FifthHouseEffects(
 	ninthLord := constants.RaashyadhipatiMapStore[string(ninthHouse)]
 	ninthLordPlacement := (*housePlacements)[string(ninthLord)]
 
+	fifthHouseEffects = append(fifthHouseEffects, "The fifth house is strong and suggests that intelligence, creativity, children, romantic fortune, and speculative gains are very good.")
+
 	// Start appending
 	if (utils.IsLordInOwnHouse(fifthLord, fifthLordHouse) && utils.IsLordInOwnHouse(ascendantLord, ascendantLordHouse)) || 
 	(utils.IsKendra(fifthLordPlacement) && utils.IsKendra(ascendantLordPlacement)) ||

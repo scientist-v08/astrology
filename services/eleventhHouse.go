@@ -34,6 +34,8 @@ func EleventHouseEffects(
 	budhPlacement := (*housePlacements)["Budha"]
 	chandraPlacement := (*housePlacements)["Chandra"]
 
+	eleventhHouseEffects = append(eleventhHouseEffects, "The eleventh house is strong and suggests that income, gains, elder siblings, social network, and fulfillment of desires are excellent")
+
 	// Start appending
 	if eleventhLordPlacementNumber == 11 || utils.IsKendra(eleventhLordPlacementNumber) || utils.IsKona(eleventhLordPlacementNumber) || isEleventhLordExalted {
 		eleventhHouseEffects = append(eleventhHouseEffects, "The native will get many gains")

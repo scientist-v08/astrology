@@ -48,30 +48,50 @@ func GeneralEffects(
 		slices.Contains([]models.AllRaashis{constants.Vruschika, constants.Meena}, models.AllRaashis((*reqBody).BudhaPlacement.Placement))
 	var countChandraAfflictions = 0
 	nShukraPlacementNumber := (*housePlacements)["NavShukra"]
+	nShaniPlacementNumber := (*housePlacements)["NavShani"]
+	nKujaPlacementNumber := (*housePlacements)["NavKuja"]
 	shukraPlacementNumber := (*housePlacements)["Shukra"]
 	shkraHousePlacementRaashi := utils.GetHouseName((*reqBody).Ascendant, shukraPlacementNumber)
 	shaniPlacementNumber := (*housePlacements)["Shani"]
 	kujaPlacementNumber := (*housePlacements)["Kuja"]
 	nShkraHousePlacementRaashi := utils.GetHouseName((*reqBody).NavAscendant, nShukraPlacementNumber)
+	nShaniHousePlacementRaashi := utils.GetHouseName((*reqBody).NavAscendant, nShaniPlacementNumber)
+	nKujaHousePlacementRaashi := utils.GetHouseName((*reqBody).NavAscendant, nKujaPlacementNumber)
 	shukraInRasiOfKuja := slices.Contains([]models.AllRaashis{constants.Mesha, constants.Vruschika}, shkraHousePlacementRaashi)
 	shukraInNavamshaOfKuja := slices.Contains([]models.AllRaashis{constants.Mesha, constants.Vruschika}, nShkraHousePlacementRaashi)
+	nShaniAspects := utils.GetShaniAspectRaashis(models.AllRaashis(nShaniHousePlacementRaashi))
+	nKujaAspects := utils.GetKujaAspectRaashis(models.AllRaashis(nKujaHousePlacementRaashi))
 	shukraAspectedByKuja := slices.Contains(*kujaAspects, shkraHousePlacementRaashi)
+	navShukraAspectedByNavKuja := slices.Contains(nKujaAspects, nShkraHousePlacementRaashi)
 	isShukraConjunctKuja := kujaPlacementNumber == shukraPlacementNumber
+	isNavShukraConjunctNavKuja := nKujaPlacementNumber == nShukraPlacementNumber
 	shukraInRasiOfShani := slices.Contains([]models.AllRaashis{constants.Kumbha, constants.Makara}, shkraHousePlacementRaashi)
 	shukraInNavamshaOfShani := slices.Contains([]models.AllRaashis{constants.Kumbha, constants.Makara}, nShkraHousePlacementRaashi)
 	shukraAspectedByShani := slices.Contains(*shaniAspects, shkraHousePlacementRaashi)
+	navShukraAspectedByNavShani := slices.Contains(nShaniAspects, nShkraHousePlacementRaashi)
 	isShukraConjunctShani := shaniPlacementNumber == shukraPlacementNumber
+	isNavShukraConjunctNavShani := nShaniPlacementNumber == nShukraPlacementNumber
+	isAggressiveSex := false
+	isGay := false;
 
 	// Start appending to string array for general placements
 	if (*housePlacements)["Shukra"] == 7 || (*housePlacements)["NavShukra"] == 7 {
 		generalEffects = append(generalEffects, "The native will be very horny")
 	}
 
-	if shukraInRasiOfKuja || shukraInNavamshaOfKuja || shukraAspectedByKuja || isShukraConjunctKuja {
-		generalEffects = append(generalEffects, "The native is likely to develop feelings to lick or kiss the private parts of the opposite gender to satisfy lust")
+	if shukraInRasiOfKuja || shukraInNavamshaOfKuja || shukraAspectedByKuja || isShukraConjunctKuja || navShukraAspectedByNavKuja || isNavShukraConjunctNavKuja {
+		isAggressiveSex = true
 	}
-	if shukraInRasiOfShani || shukraInNavamshaOfShani || shukraAspectedByShani || isShukraConjunctShani {
-		generalEffects = append(generalEffects, "The native is likely to develop feelings to lick or kiss the private parts of the same gender to satisfy lust")
+	if shukraInRasiOfShani || shukraInNavamshaOfShani || shukraAspectedByShani || isShukraConjunctShani || navShukraAspectedByNavShani || isNavShukraConjunctNavShani {
+		isGay = true
+	}
+	switch {
+	case isAggressiveSex && isGay:
+		generalEffects = append(generalEffects, "The native is likely bisexual")
+	case isAggressiveSex:
+		generalEffects = append(generalEffects, "The native is likely to kiss the private parts of the opposite gender to satisfy lust")
+	case isGay:
+		generalEffects = append(generalEffects, "The native is gay")
 	}
 
 	if isChandraAspectedByJupiter || isChandraWithGuru {
