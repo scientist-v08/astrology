@@ -32,7 +32,7 @@ func FirstHouseEffects(
 	(ascendantLordPlacement == (*housePlacements)["Shani"] && ascendantLord != models.Raashyadhipati("Shani")) || 
 	(ascendantLordPlacement == (*housePlacements)["Kuja"] && ascendantLord != models.Raashyadhipati("Kuja")) || 
 	(ascendantLordPlacement == (*housePlacements)["Surya"] && ascendantLord != models.Raashyadhipati("Surya")) {
-		firstHouseEffects = append(firstHouseEffects, "Since the ascendant lord is in a dusthana, physical pleasure will diminish")
+		firstHouseEffects = append(firstHouseEffects, "Since the ascendant lord is with a malefic, physical pleasure will diminish")
 	}
 
 	if utils.IsKendra(ascendantLordPlacement) || utils.IsKona(ascendantLordPlacement) {

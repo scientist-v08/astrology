@@ -165,7 +165,7 @@ func GeneralEffects(
 	(chandraLordPlacement == chandraHousePlacements["Shani"] && chandraLord != models.Raashyadhipati("Shani")) || 
 	(chandraLordPlacement == chandraHousePlacements["Kuja"] && chandraLord != models.Raashyadhipati("Kuja")) || 
 	(chandraLordPlacement == chandraHousePlacements["Surya"] && chandraLord != models.Raashyadhipati("Surya")) {
-		generalEffects = append(generalEffects, "Mental pleasure will diminish due to malefic aspect and dusthana placement of moon sign lord")
+		generalEffects = append(generalEffects, "Mental pleasure will diminish due to malefic conjunction with Chandra lagna lord")
 	}
 
 	if utils.IsKendra(chandraLordPlacement) || utils.IsKona(chandraLordPlacement) {
