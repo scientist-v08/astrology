@@ -58,6 +58,7 @@ func main() {
 	routes.RegisterShadbalaEffectsRoutes(r)
 	routes.RegisterPairingRoutes(r)
 	routes.RegisterUpagrahaRoutes(r)
+	routes.RegisterConditionalDasa(r)
 	
 	// Now run the application
 	r.Run()
