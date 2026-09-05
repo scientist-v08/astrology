@@ -45,13 +45,13 @@ func NadiCalculatorFunc(groomNakshatra string, brideNakshatra string) models.Kut
 		naadiComment = `Nadi dosha: This may cause either the husband or the wife or the child to develop some genetic disease 
         although modern medicine can help to mitigate them I am of the opinion prevention is better than cure.`
 
-		if slices.Contains(nadiExceptionNakshatras, groomNakshatra) {
+		if slices.Contains(nadiExceptionNakshatras, groomNakshatra) && brideNakshatra == groomNakshatra {
 			naadiScore = 7
 			naadiComment = `Nadi dosha: Exists. But astrologers have observed that this pair is exempt from the rule. 
             But ensure that the pada of the boy preceeds the pada of the girl if all the padas of a nakshatra is in the same
             Raashi else do viceversa.`
 		}
-		if slices.Contains(nadiMediocoreExceptionNakshatras, groomNakshatra) {
+		if slices.Contains(nadiMediocoreExceptionNakshatras, groomNakshatra) && brideNakshatra == groomNakshatra {
 			naadiScore = 4
 			naadiComment = `Nadi dosha: Exists. But astrologers have observed that this pair is partially exempt from the rule. 
             But ensure that the pada of the boy preceeds the pada of the girl if all the padas of a nakshatra is in the same
