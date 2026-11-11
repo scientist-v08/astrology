@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/mshafiee/swephgo"
 	"github.com/scientist-v08/bphs/constants"
 	"github.com/scientist-v08/bphs/models"
 )
@@ -14,52 +13,57 @@ func CalculateAtmakaraka(
 ) (models.AtmakarakaResult, error) {
 
 	karakaGrahas := []models.Raashyadhipati{
-		constants.Surya,
-		constants.Chandra,
-		constants.Kuja,
-		constants.Budha,
-		constants.Guru,
-		constants.Shukra,
-		constants.Shani,
-		constants.Rahu,
-	}
+        constants.Surya,
+        constants.Chandra,
+        constants.Kuja,
+        constants.Budha,
+        constants.Guru,
+        constants.Shukra,
+        constants.Shani,
+        constants.Rahu,
+    }
 
-	var result models.AtmakarakaResult
-	highestDegree := -1.0
+    var result models.AtmakarakaResult
+    highestDegree := -1.0
 
-	for _, graha := range karakaGrahas {
-		longitude, exists := longitudes[graha]
-		if !exists {
-			return models.AtmakarakaResult{}, fmt.Errorf(
-				"Missing longitude for graha: %v", graha,
-			)
-		}
+    for _, graha := range karakaGrahas {
 
-		longitude = swephgo.Degnorm(longitude)
+        longitude, exists := longitudes[graha]
 
-		degreeInRashi := math.Mod(longitude, 30)
+        if !exists {
+            return models.AtmakarakaResult{}, fmt.Errorf(
+                "missing longitude for graha: %v",
+                graha,
+            )
+        }
 
-		if graha == constants.Rahu {
+        longitude = Normalize360(longitude)
+
+        degreeInRashi := math.Mod(longitude, 30)
+
+        // Rahu's degree is counted in reverse.
+        if graha == constants.Rahu {
             degreeInRashi = 30 - degreeInRashi
         }
 
-		if degreeInRashi > highestDegree {
-			highestDegree = degreeInRashi
-			result.Graha = graha
-			result.DegreeInRashi = degreeInRashi
-		}
-	}
+        if degreeInRashi > highestDegree {
+            highestDegree = degreeInRashi
 
-	// Karakamsha is the Navamsha Rashi occupied
-	// by the Atmakaraka.
-	karakamsha, err := CalculateNavamsha(
-		longitudes[result.Graha],
-	)
-	if err != nil {
-		return models.AtmakarakaResult{}, err
-	}
+            result.Graha = graha
+            result.DegreeInRashi = degreeInRashi
+        }
+    }
 
-	result.Karakamsha = karakamsha
+    // Karakamsha = Navamsha Rashi of Atmakaraka.
+    karakamsha, err := CalculateNavamsha(
+        longitudes[result.Graha],
+    )
 
-	return result, nil
+    if err != nil {
+        return models.AtmakarakaResult{}, err
+    }
+
+    result.Karakamsha = karakamsha
+
+    return result, nil
 }
