@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/joho/godotenv v1.5.1
+	github.com/tejzpr/go-swisseph v1.0.2
 )
 
 require (
@@ -18,8 +19,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mshafiee/swephgo v1.1.0 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
-	github.com/tejzpr/go-swisseph v1.0.2 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 )
 
