@@ -206,5 +206,6 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) map[string]any {
 		"proportions": percentages,
 		"generalEffects": otherEffects,
 		"karakamshaResults": ToIndexedStrings(services.KarakamshaEffectsService(&karakamshaHousePlacements, &karakamshaReqBody)),
+        "horoscope": req,
 	}
 }
