@@ -136,8 +136,8 @@ func drekkanaBala(g models.Raashyadhipati, lon float64) float64 {
 	}
 	want := map[models.Raashyadhipati]int{
 		constants.Surya: 0, constants.Kuja: 0, constants.Guru: 0,
-		constants.Budha: 1, constants.Shani: 1,
-		constants.Chandra: 2, constants.Shukra: 2,
+		constants.Chandra: 1, constants.Shukra: 1,
+		constants.Budha: 2, constants.Shani: 2,
 	}[g]
 	if decanate == want {
 		return 15
