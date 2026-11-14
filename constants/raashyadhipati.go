@@ -10,6 +10,8 @@ const (
 	Surya   models.Raashyadhipati = "Surya"
 	Guru    models.Raashyadhipati = "Guru"
 	Shani   models.Raashyadhipati = "Shani"
+	Rahu 	models.Raashyadhipati = "Rahu"
+	Ketu 	models.Raashyadhipati = "Ketu"
 )
 
 var RaashyadhipatiMapStore = models.RaashyadhipatiMapping{

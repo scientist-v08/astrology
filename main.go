@@ -59,6 +59,7 @@ func main() {
 	routes.RegisterPairingRoutes(r)
 	routes.RegisterUpagrahaRoutes(r)
 	routes.RegisterConditionalDasa(r)
+	routes.RegisterDobRoutes(r)
 	
 	// Now run the application
 	r.Run()
