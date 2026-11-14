@@ -24,4 +24,6 @@ type ChartResult struct {
 	Atmakaraka     AtmakarakaResult
 	Longitudes     map[Raashyadhipati]float64
 	FirstHalf      bool
+	GrahaData      PlanetaryData
+	AscendantLong  float64
 }

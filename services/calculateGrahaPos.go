@@ -396,5 +396,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
         Atmakaraka:     atmakaraka,
         Longitudes:     planetaryData.Longitudes,
         FirstHalf:      firstHalf,
+        GrahaData:      planetaryData,
+        AscendantLong:  ascLongitude,
     }, nil
 }

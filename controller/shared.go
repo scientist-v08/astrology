@@ -9,6 +9,15 @@ import (
 	"github.com/scientist-v08/bphs/utils"
 )
 
+type HouseEffectsResponse struct {
+	AllHouseEffects    []models.HouseEffectsWithCommentory `json:"allHouseEffects"`
+	ZeroProportion     int8                                `json:"zeroProportion"`
+	Proportions        []float64                           `json:"proportions"`
+	GeneralEffects     []string                            `json:"generalEffects"`
+	KarakamshaResults  []IndexedString                     `json:"karakamshaResults"`
+	Horoscope          *models.HouseEffectsReqBody         `json:"horoscope"`
+}
+
 func isGrahaAfflicted(
     budha string,
     surya string,
@@ -86,7 +95,7 @@ func isNavBudhaAfflicted(
     )
 }
 
-func calculateHouseEffects(req *models.HouseEffectsReqBody) map[string]any {
+func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse {
 	// 1. Compute the different house numbers with respect to the ascendant and the navamsha ascedant and karakamsha.
 	housePlacements := map[string]int16{
 		"Surya": utils.GetHouse(req.Ascendant, req.SuryaPlacement),
@@ -200,12 +209,12 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) map[string]any {
     }
 
 	// 4. Proceed with the response
-	return map[string]any{
-		"allHouseEffects": result,
-		"zeroProportion": zeroProportionHouse,
-		"proportions": percentages,
-		"generalEffects": otherEffects,
-		"karakamshaResults": ToIndexedStrings(services.KarakamshaEffectsService(&karakamshaHousePlacements, &karakamshaReqBody)),
-        "horoscope": req,
-	}
+	return HouseEffectsResponse{
+        AllHouseEffects:   result,
+        ZeroProportion:    zeroProportionHouse,
+        Proportions:       percentages,
+        GeneralEffects:    otherEffects,
+        KarakamshaResults: ToIndexedStrings(services.KarakamshaEffectsService(&karakamshaHousePlacements, &karakamshaReqBody)),
+        Horoscope:         req,
+    }
 }
