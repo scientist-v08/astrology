@@ -5,6 +5,47 @@ import (
 	"github.com/scientist-v08/bphs/models"
 )
 
+const (
+	signCancer = 3
+	signLeo    = 4
+)
+
+// Parasara hora. Odd sign: first 15° Sun (Leo), next 15° Moon (Cancer).
+// Even sign: first 15° Moon, next 15° Sun.
+func parasaraHoraSign(lon float64) int {
+	sunHora := degreesInSign(lon) < 15
+	if !isOddSign(signOf(lon)) {
+		sunHora = !sunHora
+	}
+	if sunHora {
+		return signLeo
+	}
+	return signCancer
+}
+
+// Drekkana: 1st decanate = same sign, 2nd = 5th from it, 3rd = 9th from it.
+func drekkanaSign(lon float64) int {
+	div := int(degreesInSign(lon) / 10)
+	if div > 2 {
+		div = 2
+	}
+	return (signOf(lon) + 4*div) % 12
+}
+
+// Saptamsa: 7 parts of 30/7°. Odd sign counts forward from itself,
+// even sign counts forward from its 7th.
+func saptamsaSignOld(lon float64) int {
+	part := int(degreesInSign(lon) / (30.0 / 7))
+	if part > 6 {
+		part = 6
+	}
+	start := signOf(lon)
+	if !isOddSign(start) {
+		start = (start + 6) % 12
+	}
+	return (start + part) % 12
+}
+
 // Sign indices below follow constants.RaashiOrder (0 = Aries ... 11 = Pisces).
 
 // ---------------------------------------------------------------------------

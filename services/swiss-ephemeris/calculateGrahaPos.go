@@ -1,4 +1,4 @@
-package services
+package swissEphemeris
 
 import (
 	"bytes"
@@ -34,14 +34,17 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
     }
 
     data := models.PlanetaryData{
-        Rashis:     make(models.GrahaPositions),
-        Longitudes: make(map[models.Raashyadhipati]float64),
-        Speeds:     make(map[models.Raashyadhipati]float64),
+        Rashis:       make(models.GrahaPositions),
+        Longitudes:   make(map[models.Raashyadhipati]float64),
+        Speeds:       make(map[models.Raashyadhipati]float64),
+        Declinations: make(map[models.Raashyadhipati]float64),
     }
 
     flags := swephgo.SeflgSwieph |
         swephgo.SeflgSidereal |
         swephgo.SeflgSpeed
+
+    eqFlags := swephgo.SeflgSwieph | swephgo.SeflgEquatorial
 
     for _, graha := range grahas {
 
@@ -73,8 +76,21 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
 
         rashiIndex := int(longitude / 30)
 
-        data.Rashis[graha.Name] =
-            constants.RaashiOrder[rashiIndex]
+        data.Rashis[graha.Name] = constants.RaashiOrder[rashiIndex]
+
+        xxEq := make([]float64, 6)
+		serrEq := make([]byte, 256)
+
+		retEq := swephgo.CalcUt(jd, graha.Planet, eqFlags, xxEq, serrEq)
+		errMsgEq := string(bytes.Trim(serrEq, "\x00"))
+		if retEq < 0 {
+			return models.PlanetaryData{}, fmt.Errorf(
+				"failed to calculate %s (equatorial): %s", graha.Name, errMsgEq,
+			)
+		}
+
+		// xxEq[1] is the declination in degrees
+		data.Declinations[graha.Name] = xxEq[1]
 
         // Ketu is exactly opposite Rahu.
         if graha.Name == constants.Rahu {
@@ -100,12 +116,12 @@ func calculateAscendant(
     jd float64,
     latitude float64,
     longitude float64,
-) (float64, error) {
+) (float64, float64, error) {
 
     cusps := make([]float64, 13)
     ascmc := make([]float64, 10)
 
-    hsys := int('W')
+    hsys := int('E')
 
     flags := swephgo.SeflgSidereal
 
@@ -120,12 +136,12 @@ func calculateAscendant(
     )
 
     if ret < 0 {
-        return 0, fmt.Errorf(
+        return 0, 0, fmt.Errorf(
             "failed to calculate ascendant",
         )
     }
 
-    return utils.Normalize360(ascmc[0]), nil
+    return utils.Normalize360(ascmc[0]), utils.Normalize360(ascmc[1]),nil
 }
 
 func calculateNavamshaPlacements(
@@ -241,32 +257,60 @@ func calculatePaksha(
     return "Krishna Paksha", false
 }
 
+// calculateSunTimes computes the sunrise, sunset, and whether the birth occurred during the day.
+func calculateSunTimes(jd, longitude, latitude float64) (sunriseJD, sunsetJD float64, isDayBirth bool, err error) {
+	geopos := []float64{
+		longitude, // East positive
+		latitude,  // North positive
+		0,         // altitude (sea level is fine)
+	}
+
+	// Sunrise
+    rsSunrise := make([]float64, 1)
+	serrRise := make([]byte, 256)
+	retRise := swephgo.RiseTrans(
+		jd, // approximate start
+		swephgo.SeSun,
+		nil,
+		swephgo.SeflgSwieph,
+		swephgo.SeCalcRise,
+		geopos,
+		0, 0, // atmospheric pressure & temperature (0 = default)
+		rsSunrise,
+		serrRise,
+	)
+	if retRise < 0 {
+		return 0, 0, false, fmt.Errorf("sunrise calculation failed: %s", string(bytes.Trim(serrRise, "\x00")))
+	}
+
+	// Sunset
+    rsSunset := make([]float64, 1)
+	serrSet := make([]byte, 256)
+	retSet := swephgo.RiseTrans(
+		jd,
+		swephgo.SeSun,
+		nil,
+		swephgo.SeflgSwieph,
+		swephgo.SeCalcSet,
+		geopos,
+		0, 0,
+		rsSunset,
+		serrSet,
+	)
+	if retSet < 0 {
+		return 0, 0, false, fmt.Errorf("sunset calculation failed: %s", string(bytes.Trim(serrSet, "\x00")))
+	}
+
+	isDayBirth = jd >= sunriseJD && jd < sunsetJD
+
+	return sunriseJD, sunsetJD, isDayBirth, nil
+}
+
 var swephMutex sync.Mutex
 
 func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartResult, error) {
 	swephMutex.Lock()
     defer swephMutex.Unlock()
-
-    // Validate input.
-    if birthDetailsReq.BirthDateTime.IsZero() {
-        return models.ChartResult{}, fmt.Errorf(
-            "birth date and time are required",
-        )
-    }
-
-    if birthDetailsReq.Latitude < -90 ||
-        birthDetailsReq.Latitude > 90 {
-        return models.ChartResult{}, fmt.Errorf(
-            "latitude must be between -90 and 90",
-        )
-    }
-
-    if birthDetailsReq.Longitude < -180 ||
-        birthDetailsReq.Longitude > 180 {
-        return models.ChartResult{}, fmt.Errorf(
-            "longitude must be between -180 and 180",
-        )
-    }
 
     ephePath, err := filepath.Abs("./ephe")
     if err != nil {
@@ -303,6 +347,18 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     )
 
     // -------------------------------------------------
+    // Sunrise & Sunset (required for Nathonnata / Kaala Bala)
+    // -------------------------------------------------
+    sunriseJD, sunsetJD, isDayBirth, err := calculateSunTimes(
+        jd,
+        birthDetailsReq.Longitude,
+        birthDetailsReq.Latitude,
+    )
+    if err != nil {
+        return models.ChartResult{}, err
+    }
+
+    // -------------------------------------------------
     // 1. Planetary longitudes and D1 Rashis.
     // -------------------------------------------------
 
@@ -327,7 +383,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     // 2. Ascendant.
     // -------------------------------------------------
 
-    ascLongitude, err := calculateAscendant(
+    ascLongitude, msLongitude, err := calculateAscendant(
         jd,
         birthDetailsReq.Latitude,
         birthDetailsReq.Longitude,
@@ -398,5 +454,9 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
         FirstHalf:      firstHalf,
         GrahaData:      planetaryData,
         AscendantLong:  ascLongitude,
+        SunriseJD:  sunriseJD,
+        SunsetJD:   sunsetJD,
+        IsDayBirth: isDayBirth,
+        MsLong: msLongitude,
     }, nil
 }

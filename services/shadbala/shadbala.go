@@ -28,11 +28,20 @@ type Input struct {
 	// Chart carries the already-computed D1/D9 placements and the ascendant.
 	// TODO: adjust the package if HouseEffectsReqBody does not live in models.
 	Chart models.HouseEffectsReqBody
+
+	// For Drik & Dig Bala
+	AscendantLong  float64
+	MsLong  float64
+	SunriseJD      float64
+	SunsetJD       float64
+	IsDayBirth     bool
 }
 
 // Result is what the controller receives. New balas get added as fields.
 type Result struct {
 	Sthana SthanaBalaResult `json:"sthana"`
+	Dig    DigBalaResult    `json:"dig"`
+	Drik   DrikBalaResult   `json:"drik"`
 }
 
 // Service is the Shad Bala orchestrator.
@@ -49,5 +58,7 @@ func (s *Service) Calculate(in Input) (*Result, error) {
 
 	return &Result{
 		Sthana: calculateSthanaBala(ctx),
+		Dig:    calculateDigBala(ctx),
+		Drik:   calculateDrikBala(ctx),
 	}, nil
 }

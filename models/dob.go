@@ -3,9 +3,10 @@ package models
 type GrahaPositions map[Raashyadhipati]string
 
 type PlanetaryData struct {
-	Rashis     GrahaPositions
-	Longitudes map[Raashyadhipati]float64
-	Speeds     map[Raashyadhipati]float64
+	Rashis       GrahaPositions
+	Longitudes   map[Raashyadhipati]float64
+	Speeds       map[Raashyadhipati]float64
+	Declinations map[Raashyadhipati]float64
 }
 
 type NavamshaData struct {
@@ -26,4 +27,8 @@ type ChartResult struct {
 	FirstHalf      bool
 	GrahaData      PlanetaryData
 	AscendantLong  float64
+	MsLong         float64
+	SunriseJD      float64
+	SunsetJD       float64
+	IsDayBirth     bool
 }

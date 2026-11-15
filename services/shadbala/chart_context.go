@@ -22,6 +22,14 @@ type chartContext struct {
 	rasiSign    map[models.Raashyadhipati]int     // D1 sign index (from request body)
 	navamsaSign map[models.Raashyadhipati]int     // D9 sign index (from request body)
 	ascSign     int               // lagna sign index (from request body)
+	ascendantLong float64                          // exact lagna longitude
+	chandraWaxing bool
+	speeds        map[models.Raashyadhipati]float64
+	declinations  map[models.Raashyadhipati]float64 // tropical
+	sunriseJD     float64
+	sunsetJD      float64
+	isDayBirth    bool
+	mclong        float64
 }
 
 // d1Placements / d9Placements pull the placements out of the request body.
@@ -53,9 +61,11 @@ func d9Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string
 // against the longitudes so the two data sources can never silently disagree.
 func newChartContext(in Input) (*chartContext, error) {
 	c := &chartContext{
-		longitude:   make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		rasiSign:    make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
-		navamsaSign: make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
+		longitude:    make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		rasiSign:     make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
+		navamsaSign:  make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
+		speeds:       make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		declinations: make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
 	}
 
 	d1 := d1Placements(in.Chart)
@@ -69,7 +79,15 @@ func newChartContext(in Input) (*chartContext, error) {
 		lon = utils.Normalize360(lon)
 		c.longitude[g] = lon
 
-		// D1: body placement must match the longitude.
+		// Speeds & Declinations (from the extended PlanetaryData)
+		if in.Planets.Speeds != nil {
+			c.speeds[g] = in.Planets.Speeds[g]
+		}
+		if in.Planets.Declinations != nil {
+			c.declinations[g] = in.Planets.Declinations[g]
+		}
+
+		// D1 validation
 		rs, err := rashiIndex(d1[g])
 		if err != nil {
 			return nil, fmt.Errorf("D1 placement of %s: %w", g, err)
@@ -80,7 +98,7 @@ func newChartContext(in Input) (*chartContext, error) {
 		}
 		c.rasiSign[g] = rs
 
-		// D9: body placement must match utils.CalculateNavamsha.
+		// D9 validation
 		ns, err := rashiIndex(d9[g])
 		if err != nil {
 			return nil, fmt.Errorf("D9 placement of %s: %w", g, err)
@@ -101,6 +119,18 @@ func newChartContext(in Input) (*chartContext, error) {
 		return nil, fmt.Errorf("ascendant: %w", err)
 	}
 	c.ascSign = asc
+
+	// ---------- NEW fields that must come from the upstream ChartResult ----------
+	// You need to pass these through the Input / HouseEffectsReqBody transformation.
+
+	// For now I assume you will add them to Input or to HouseEffectsReqBody.
+	// Example:
+	c.ascendantLong = in.AscendantLong          // you must expose this
+	c.chandraWaxing = in.Chart.ChandraWaxing
+	c.sunriseJD = in.SunriseJD
+	c.sunsetJD = in.SunsetJD
+	c.isDayBirth = in.IsDayBirth
+	c.mclong = in.MsLong
 
 	return c, nil
 }
