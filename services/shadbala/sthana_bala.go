@@ -127,8 +127,8 @@ func kendradiBala(planetSign, ascSign int) float64 {
 // drekkanaBala: 15 Virupas when the planet occupies its
 // favoured Drekkana.
 // Sun/Mars/Jupiter: 1st Drekkana
-// Mercury/Saturn:   2nd Drekkana
-// Moon/Venus:       3rd Drekkana
+// Moon/Venus:       2nd Drekkana
+// Mercury/Saturn:   3rd Drekkana
 func drekkanaBala(g models.Raashyadhipati, lon float64) float64 {
     decanate := int(degreesInSign(lon) / 10)
 	if decanate > 2 {

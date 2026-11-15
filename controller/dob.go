@@ -8,8 +8,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/scientist-v08/bphs/constants"
 	"github.com/scientist-v08/bphs/models"
-	"github.com/scientist-v08/bphs/services"
 	"github.com/scientist-v08/bphs/services/shadbala"
+	swissEphemeris "github.com/scientist-v08/bphs/services/swiss-ephemeris"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -43,8 +43,35 @@ func DobForAll(c *gin.Context) {
 		return
 	}
 
+	// Validate input.
+    if req.BirthDateTime.IsZero() {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "validation failed",
+			"details": "birth date and time are required",
+		})
+		return
+    }
+
+    if req.Latitude < -90 ||
+        req.Latitude > 90 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   "validation failed",
+				"details": "latitude must be between -90 and 90",
+			})
+			return
+    }
+
+    if req.Longitude < -180 ||
+        req.Longitude > 180 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   "validation failed",
+				"details": "longitude must be between -180 and 180",
+			})
+			return
+    }
+
 	// 3. Obtain the chart from the DOB
-	chart, err := services.CalculateGrahaRashis(req)
+	chart, err := swissEphemeris.CalculateGrahaRashis(req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -59,7 +86,15 @@ func DobForAll(c *gin.Context) {
 	result := calculateHouseEffects(&houseEffectsReqBody)
 
 	// 6. Obtain the balas
-	balas, err := shadbala.NewService().Calculate(shadbala.Input{Planets: chart.GrahaData, Chart: *result.Horoscope})
+	balas, err := shadbala.NewService().Calculate(shadbala.Input{
+		Planets: chart.GrahaData, 
+		Chart: *result.Horoscope,
+		AscendantLong:  chart.AscendantLong,
+		MsLong: chart.MsLong,
+		SunriseJD:      chart.SunriseJD,
+		SunsetJD:       chart.SunsetJD,
+		IsDayBirth:     chart.IsDayBirth,
+	})
 	if err != nil {
 		fmt.Printf("Shadbala calculation failed: %v\n", err)
 		return
@@ -72,10 +107,10 @@ func DobForAll(c *gin.Context) {
 	headers := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 
 	// Helper to print a row
-	printRow := func(label string, getter func(shadbala.SthanaBala) float64) {
+	printRow := func(label string, getter func(models.Raashyadhipati) float64) {
 		fmt.Printf("%-12s", label)
 		for _, g := range order {
-			fmt.Printf("%10.2f", getter(balas.Sthana[g]))
+			fmt.Printf("%10.2f", getter(g))
 		}
 		fmt.Println()
 	}
@@ -95,12 +130,9 @@ func DobForAll(c *gin.Context) {
 	fmt.Println()
 
 	// Rows
-	printRow("Uchcha", func(b shadbala.SthanaBala) float64 { return b.Uchcha })
-	printRow("Saptavarga", func(b shadbala.SthanaBala) float64 { return b.Saptavarga })
-	printRow("OjaYugma", func(b shadbala.SthanaBala) float64 { return b.OjaYugma })
-	printRow("Kendra", func(b shadbala.SthanaBala) float64 { return b.Kendra })
-	printRow("Drekkana", func(b shadbala.SthanaBala) float64 { return b.Drekkana })
-	printRow("Total", func(b shadbala.SthanaBala) float64 { return b.Total })
+	printRow("Sthana", func(g models.Raashyadhipati) float64 { return balas.Sthana[g].Total })
+	printRow("Dig", func(g models.Raashyadhipati) float64 { return balas.Dig.Values[g] })
+	printRow("Drik", func(g models.Raashyadhipati) float64 { return balas.Drik.Values[g] })
 
 	// 6. Send back the results
 	c.JSON(http.StatusOK, result)
