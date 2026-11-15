@@ -121,7 +121,7 @@ func calculateAscendant(
     cusps := make([]float64, 13)
     ascmc := make([]float64, 10)
 
-    hsys := int('W')
+    hsys := int('E')
 
     flags := swephgo.SeflgSidereal
 
@@ -324,7 +324,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
 
     // Set True Pushya Paksha Ayanamsha.
     swephgo.SetSidMode(
-        swephgo.SeSidmLahiri,
+        swephgo.SeSidmTruePushya,
         0,
         0,
     )

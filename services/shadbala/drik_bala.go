@@ -5,101 +5,75 @@ import (
 
 	"github.com/scientist-v08/bphs/constants"
 	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/utils"
 )
 
-// aspectStrength returns the absolute aspect strength (0–60)
-// matching the key points given by Jaya Sekhar.
 func aspectStrength(delta float64) float64 {
-    d := math.Mod(delta, 360)
-    if d < 0 {
-        d += 360
-    }
-
-    switch {
-    case d <= 30:
-        return 0
-
-    case d <= 75:
-        return (d - 30) * (30.0 / 45.0)
-
-    case d <= 90:
-        return 30 + (d-75)
-
-    case d <= 120:
-    	return 45 - (d-90)*(25.0/30.0)
-
-	case d <= 150:
-    	return 20 * (150-d) / 30.0
-
-    case d <= 165:
-        return (d - 150) * 2
-
-    case d <= 172.5:
-        return 30 + (d-165)*2
-
-    case d <= 180:
-        return 45 + (d-172.5)*2
-
-    case d <= 210:
-        return 60 - (d-180)*0.5
-
-    case d <= 240:
-        return 45 - (d-210)*0.5
-
-    case d <= 300:
-        return 30 - (d-240)*0.5
-
-    default:
-        return 0
-    }
+	d := math.Mod(delta, 360)
+	if d < 0 {
+		d += 360
+	}
+	switch {
+	case d < 30:
+		return 0
+	case d < 60:
+		return (d - 30) / 2
+	case d < 90:
+		return (d - 60) + 15
+	case d < 120:
+		return 45 - (d-90)/2
+	case d < 150:
+		return 30 - (d - 120)
+	case d < 180:
+		return (d - 150) * 2
+	case d < 300:
+		return (300 - d) / 2
+	default:
+		return 0
+	}
 }
 
-// isNaturalMalefic decides the sign of the aspect energy.
-func isNaturalMalefic(p models.Raashyadhipati, waxingMoon bool) bool {
+func rasiOf(lon float64) int { return int(utils.Normalize360(lon) / 30) }
+
+func isMaleficForDrik(p models.Raashyadhipati, ctx *chartContext) bool {
 	switch p {
 	case constants.Surya, constants.Kuja, constants.Shani:
 		return true
 	case constants.Chandra:
-		return !waxingMoon // waning Moon is malefic
+		elong := utils.Normalize360(ctx.longitude[constants.Chandra] - ctx.longitude[constants.Surya])
+		return elong < 90 || elong > 270
 	case constants.Budha:
-		// Classical: unafflicted Mercury is benefic.
-		// For pure Drik we treat it as benefic unless you later pass combustion/affliction.
-		return false
-	default: // Guru, Shukra
+		r := rasiOf(ctx.longitude[constants.Budha])
+		for _, q := range []models.Raashyadhipati{constants.Surya, constants.Kuja, constants.Shani} {
+			if rasiOf(ctx.longitude[q]) == r {
+				return true
+			}
+		}
 		return false
 	}
+	return false // Guru, Shukra
 }
 
-// calculateDrikBala computes net aspect energy received by each planet.
 func calculateDrikBala(ctx *chartContext) DrikBalaResult {
-	res := DrikBalaResult{
-		Values: make(map[models.Raashyadhipati]float64),
-	}
-
+	res := DrikBalaResult{Values: make(map[models.Raashyadhipati]float64)}
 	planets := []models.Raashyadhipati{
 		constants.Surya, constants.Chandra, constants.Kuja,
 		constants.Budha, constants.Guru, constants.Shukra, constants.Shani,
 	}
-
-	for _, receiver := range planets {
+	for _, rec := range planets {
 		var net float64
-		recLon := ctx.longitude[receiver]
-
-		for _, aspector := range planets {
-			if aspector == receiver {
+		for _, asp := range planets {
+			if asp == rec {
 				continue
 			}
-			aspLon := ctx.longitude[aspector]
-			strength := aspectStrength(recLon - aspLon)
-
-			if isNaturalMalefic(aspector, ctx.chandraWaxing) {
-				strength = -strength
+			s := aspectStrength(ctx.longitude[rec] - ctx.longitude[asp])
+			if isMaleficForDrik(asp, ctx) {
+				s = -s
 			}
-			net += strength
+			net += s
 		}
-		res.Values[receiver] = net
+		res.Values[rec] = net / 4 // Drik Bala = ¼ of net aspect energy
 	}
-
 	return res
 }
 

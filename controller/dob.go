@@ -86,6 +86,7 @@ func DobForAll(c *gin.Context) {
 	result := calculateHouseEffects(&houseEffectsReqBody)
 
 	// 6. Obtain the balas
+	fmt.Println(chart.AscendantLong)
 	balas, err := shadbala.NewService().Calculate(shadbala.Input{
 		Planets: chart.GrahaData, 
 		Chart: *result.Horoscope,

@@ -15,23 +15,22 @@ func digBalaForPlanet(
 	planet models.Raashyadhipati,
 ) float64 {
 
-	// Cardinal midpoints (equal-house style from Ascendant)
-	// 1st = Asc, 4th = Asc+90, 7th = Asc+180, 10th = Asc+270
-	mid1 := utils.Normalize360(ascLon)           // East  – Lagna
-	mid4 := utils.Normalize360(ascLon + 90)      // South
-	mid7 := utils.Normalize360(ascLon + 180)     // West
-	mid10 := utils.Normalize360(ascLon + 270)    // North
+	// Cardinal points using actual Ascendant (1st/7th) and MC (10th/4th)
+	mid1 := utils.Normalize360(ascLon)        // 1st cusp (Ascendant / East)
+	mid7 := utils.Normalize360(ascLon + 180)  // 7th cusp (Descendant / West)
+	mid10 := utils.Normalize360(mcLon)        // 10th cusp (MC / South)
+	mid4 := utils.Normalize360(mcLon + 180)   // 4th cusp (IC / North)
 
 	var weakPoint float64
 
 	switch planet {
-	case constants.Surya, constants.Kuja: // strongest at 10th → weak at 4th
+	case constants.Surya, constants.Kuja: // strongest at 10th (MC) → weak at 4th (IC)
 		weakPoint = mid4
-	case constants.Chandra, constants.Shukra: // strongest at 4th → weak at 10th
+	case constants.Chandra, constants.Shukra: // strongest at 4th (IC) → weak at 10th (MC)
 		weakPoint = mid10
-	case constants.Guru, constants.Budha: // strongest at 1st → weak at 7th
+	case constants.Guru, constants.Budha: // strongest at 1st (Asc) → weak at 7th (Desc)
 		weakPoint = mid7
-	case constants.Shani: // strongest at 7th → weak at 1st
+	case constants.Shani: // strongest at 7th (Desc) → weak at 1st (Asc)
 		weakPoint = mid1
 	default:
 		return 0 // Rahu/Ketu not calculated in classical Dig Bala
@@ -43,7 +42,7 @@ func digBalaForPlanet(
 		diff = 360 - diff
 	}
 
-	// Dig Bala = arc / 3  → 0 … 60 Virupas
+	// Dig Bala = arc / 3  → 0 … 60 Virupas (Shashtiamsas)
 	return diff / 3.0
 }
 
