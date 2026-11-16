@@ -20,7 +20,7 @@ type KaalaBalaResult struct {
 	Masa       map[models.Raashyadhipati]float64 `json:"masa"`
 	Vara       map[models.Raashyadhipati]float64 `json:"vara"`
 	Hora       map[models.Raashyadhipati]float64 `json:"hora"`
-	Yuddha     map[models.Raashyadhipati]float64 `json:"yuddha"`
+	// Yuddha     map[models.Raashyadhipati]float64 `json:"yuddha"`
 	Total      map[models.Raashyadhipati]float64 `json:"total"`
 }
 
@@ -244,36 +244,34 @@ func calculateNathonnataBala(ctx *chartContext, birthJD, lat, lon float64) (map[
 
 func calculatePakshaBala(ctx *chartContext) map[models.Raashyadhipati]float64 {
 	res := make(map[models.Raashyadhipati]float64, 7)
-	sunLon := ctx.longitude[constants.Surya]
-	moonLon := ctx.longitude[constants.Chandra]
-	elong := angularSeparation(moonLon, sunLon) // 0..180
-
-	base := elong / 3.0 // 0 at conjunction, 60 at opposition
+	elong := angularSeparation(ctx.longitude[constants.Chandra], ctx.longitude[constants.Surya]) // 0..180
+	base := elong / 3.0
 
 	for _, g := range shadbalaGrahas {
 		switch g {
 		case constants.Chandra:
-			// Classical practice (and Jaya Sekhar): Moon receives double Paksha
-			if ctx.chandraWaxing {
-				res[g] = base * 2
-			} else {
-				res[g] = (60 - base) * 2
-			}
-		case constants.Budha, constants.Guru, constants.Shukra: // benefics
-			if ctx.chandraWaxing {
-				res[g] = base
-			} else {
-				res[g] = 60 - base
-			}
-		case constants.Surya, constants.Kuja, constants.Shani: // malefics
-			if ctx.chandraWaxing {
-				res[g] = 60 - base
-			} else {
-				res[g] = base
-			}
+			res[g] = 2 * base
+		case constants.Guru, constants.Shukra:
+			res[g] = base
+		case constants.Budha:
+			if mercuryIsBenefic(ctx) { res[g] = base } else { res[g] = 60 - base }
+		default: // Surya, Kuja, Shani
+			res[g] = 60 - base
 		}
 	}
 	return res
+}
+
+// Mercury is a malefic when it shares a sign with a malefic.
+func mercuryIsBenefic(ctx *chartContext) bool {
+	sign := func(g models.Raashyadhipati) int { return int(ctx.longitude[g] / 30) }
+	m := sign(constants.Budha)
+	for _, g := range []models.Raashyadhipati{constants.Surya, constants.Kuja, constants.Shani} {
+		if sign(g) == m {
+			return false
+		}
+	}
+	return true
 }
 
 func calculateTribhagaBala(ctx *chartContext, birthJD, lat, lon float64) (map[models.Raashyadhipati]float64, error) {
@@ -348,37 +346,30 @@ func calculateTribhagaBala(ctx *chartContext, birthJD, lat, lon float64) (map[mo
 
 func calculateAyanaBala(ctx *chartContext) map[models.Raashyadhipati]float64 {
 	res := make(map[models.Raashyadhipati]float64, 7)
-	const maxDecl = 23.45
+	const maxDecl = 23.45 // 23°27'
 
 	for _, g := range shadbalaGrahas {
 		decl := ctx.declinations[g]
-		absDecl := math.Abs(decl)
-		ratio := absDecl / maxDecl
-		if ratio > 1 {
-			ratio = 1
-		}
 
+		// "favourable" is positive on the side where the planet gains strength
+		var favourable float64
 		switch g {
 		case constants.Surya, constants.Kuja, constants.Guru, constants.Shukra:
-			// Stronger in northern declination
-			if decl >= 0 {
-				res[g] = 30 + 30*ratio
-			} else {
-				res[g] = 30 - 30*ratio
-			}
+			favourable = decl // north is strong
 		case constants.Chandra, constants.Shani:
-			// Stronger in southern declination
-			if decl <= 0 {
-				res[g] = 30 + 30*ratio
-			} else {
-				res[g] = 30 - 30*ratio
-			}
+			favourable = -decl // south is strong
 		case constants.Budha:
-			// Neutral / average in most practical implementations
-			res[g] = 30
+			favourable = math.Abs(decl) // always positive
 		}
+
+		ratio := math.Max(-1, math.Min(1, favourable/maxDecl))
+		bala := 30 + 30*ratio
+
+		if g == constants.Surya {
+			bala *= 2 // Parashara doubles the Sun's Ayana Bala
+		}
+		res[g] = bala
 	}
-	// Classical note: Sun’s Ayana is often doubled later when used as Chesta
 	return res
 }
 
@@ -461,12 +452,12 @@ func calculateKaalaBala(ctx *chartContext, planets models.PlanetaryData) KaalaBa
 	for _, g := range shadbalaGrahas {
 		prelim[g] = nath[g] + pak[g] + tri[g] + abda[g] + masa[g] + vara[g] + hora[g]
 	}
-	yuddha := calculateYuddhaBala(planets, prelim)
+	// yuddha := calculateYuddhaBala(planets, prelim)
 
 	total := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
-		total[g] = nath[g] + pak[g] + tri[g] + aya[g] +
-			abda[g] + masa[g] + vara[g] + hora[g] + yuddha[g]
+		total[g] = nath[g] + pak[g] + tri[g] +
+			abda[g] + masa[g] + vara[g] + hora[g]
 	}
 
 	return KaalaBalaResult{
@@ -478,7 +469,6 @@ func calculateKaalaBala(ctx *chartContext, planets models.PlanetaryData) KaalaBa
 		Masa:       masa,
 		Vara:       vara,
 		Hora:       hora,
-		Yuddha:     yuddha,
 		Total:      total,
 	}
 }

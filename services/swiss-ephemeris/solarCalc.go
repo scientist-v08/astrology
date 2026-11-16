@@ -18,6 +18,16 @@ func julianDayUT(t time.Time) float64 {
         float64(utc.Nanosecond())/86400e9
 }
 
+func sunSiderealLon(jd float64) (float64, error) {
+	xx := make([]float64, 6)
+	serr := make([]byte, 256)
+	flags := swephgo.SeflgSwieph | swephgo.SeflgSidereal | swephgo.SeflgSpeed
+	if swephgo.CalcUt(jd, swephgo.SeSun, flags, xx, serr) < 0 {
+		return 0, fmt.Errorf("CalcUt failed: %s", string(bytes.Trim(serr, "\x00")))
+	}
+	return utils.Normalize360(xx[0]), nil
+}
+
 // findSunIngress finds the Julian Day when the Sun's sidereal longitude
 // reaches (or most closely approaches) targetLon (0–360).
 // It searches in a window around approxJD.
@@ -65,11 +75,11 @@ func findSunIngress(approxJD, targetLon float64) (float64, error) {
 	diffLow := circDiff(lonLow, targetLon)
 	diffHigh := circDiff(lonHigh, targetLon)
 
-	// If both sides have the same sign and the absolute difference is large,
-	// the target is probably not inside this window.
 	if (diffLow > 0 && diffHigh > 0) || (diffLow < 0 && diffHigh < 0) {
-		// Optional: you can expand the window or return an error
-		// For solar motion this almost never happens with ±45 days.
+		return 0, fmt.Errorf(
+			"target longitude %.4f° not crossed within ±%.1f days of JD %.4f (lonLow=%.4f°, lonHigh=%.4f°)",
+			targetLon, searchWindow, approxJD, lonLow, lonHigh,
+		)
 	}
 
 	// Bisection
@@ -88,13 +98,10 @@ func findSunIngress(approxJD, targetLon float64) (float64, error) {
 
 		// Decide which side to discard using the sign of the difference
 		if (diffLow < 0 && diffMid < 0) || (diffLow > 0 && diffMid > 0) {
-			// same sign → move the low boundary
 			low = mid
-			lonLow = lonMid
 			diffLow = diffMid
 		} else {
 			high = mid
-			lonHigh = lonMid
 			diffHigh = diffMid
 		}
 	}
@@ -103,47 +110,35 @@ func findSunIngress(approxJD, targetLon float64) (float64, error) {
 	return (low + high) / 2, nil
 }
 
-// getMeshaSankrantiJD returns the JD of the most recent Mesha Saṅkrānti
-// (Sun entering 0° sidereal) on or before the given birth JD.
-func getMeshaSankrantiJD(birthJD float64) (float64, error) {
-	// A rough estimate: Sun moves ~1°/day, so go back up to ~370 days
-	approx := birthJD - 10 // start a little before birth
-
-	jd, err := findSunIngress(approx, 0.0)
+// lastSunIngress returns the JD of the most recent moment on or before
+// birthJD at which the Sun's sidereal longitude equalled targetLon.
+func lastSunIngress(birthJD, targetLon float64) (float64, error) {
+	lon, err := sunSiderealLon(birthJD)
 	if err != nil {
 		return 0, err
 	}
-
-	// If the found ingress is after birth, go one year earlier
-	if jd > birthJD {
-		jd, err = findSunIngress(jd-365.25, 0.0)
-		if err != nil {
-			return 0, err
-		}
+	back := utils.Normalize360(lon - targetLon)       // degrees travelled since ingress
+	approx := birthJD - back*(365.25/360.0)            // good to a few days
+	jd, err := findSunIngress(approx, targetLon)       // keep searchWindow, or cut to 20
+	if err != nil {
+		return 0, err
 	}
-
+	if jd > birthJD { // only possible at the exact edge
+		return findSunIngress(birthJD-1-back*(365.25/360.0), targetLon)
+	}
 	return jd, nil
+}
+
+func getMeshaSankrantiJD(birthJD float64) (float64, error) {
+	return lastSunIngress(birthJD, 0)
 }
 
 // getSolarMonthStartJD returns the JD when the Sun entered the rāśi
 // that it occupies at birthJD.
 func getSolarMonthStartJD(birthJD float64, sunLongitudeAtBirth float64) (float64, error) {
-	// Current rāśi start longitude
-	rashiStart := math.Floor(sunLongitudeAtBirth/30.0) * 30.0
-
-	// Search near birth
-	jd, err := findSunIngress(birthJD, rashiStart)
+	lon, err := sunSiderealLon(birthJD)
 	if err != nil {
 		return 0, err
 	}
-
-	// Safety: if we somehow got a future ingress, go one month earlier
-	if jd > birthJD {
-		jd, err = findSunIngress(jd-35, rashiStart)
-		if err != nil {
-			return 0, err
-		}
-	}
-
-	return jd, nil
+	return lastSunIngress(birthJD, math.Floor(lon/30)*30)
 }

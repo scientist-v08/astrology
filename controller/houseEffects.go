@@ -267,6 +267,10 @@ func BhavaLordEffectsHandler(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, sharedBhavaLordsEffects(req))
+}
+
+func sharedBhavaLordsEffects(req models.BhavaLordAndShadBalaReqBody) map[string]any {
 	grahas := []string{"Surya", "Chandra", "Kuja", "Budha", "Guru", "Shukra", "Shani"}
 	allGrahaDefined := make([]models.ShadBalaResField, 7)
 	allGrahaDefinedSthana := make([]models.ShadBalaResField, 7)
@@ -407,7 +411,7 @@ func BhavaLordEffectsHandler(c *gin.Context) {
 		shadBalaComments = "The individual will gain success smoothly. " + conclusion
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	return map[string]any{
 		"effects": effects,
 		"shadRanks": allGrahaDefined,
 		"shadBalaComments": shadBalaComments,
@@ -415,5 +419,5 @@ func BhavaLordEffectsHandler(c *gin.Context) {
 		"kaalaranks": allGrahaDefinedKaala,
 		"top3SthanaLords": top3SthanaLords,
 		"sthanaRanks": allGrahaDefinedSthana,
-	})
+	}
 }

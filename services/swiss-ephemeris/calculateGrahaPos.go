@@ -328,7 +328,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
 
     // Set True Pushya Paksha Ayanamsha.
     swephgo.SetSidMode(
-        swephgo.SeSidmTruePushya,
+        swephgo.SeSidmLahiri,
         0,
         0,
     )
