@@ -95,6 +95,11 @@ func DobForAll(c *gin.Context) {
 		SunriseJD:      chart.SunriseJD,
 		SunsetJD:       chart.SunsetJD,
 		IsDayBirth:     chart.IsDayBirth,
+		BirthDateTime:  req.BirthDateTime,
+		Latitude:       req.Latitude,
+		Longitude:      req.Longitude,
+		MeshaJD:           chart.MeshaJD,
+		SolarMonthStartJD: chart.SolarMonthStartJD,
 	})
 	if err != nil {
 		fmt.Printf("Shadbala calculation failed: %v\n", err)

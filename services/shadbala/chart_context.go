@@ -3,36 +3,41 @@ package shadbala
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"github.com/scientist-v08/bphs/constants"
 	"github.com/scientist-v08/bphs/models"
 	"github.com/scientist-v08/bphs/utils"
 )
 
-// The seven grahas that take part in Shad Bala (Rahu/Ketu are excluded).
 var shadbalaGrahas = []models.Raashyadhipati{
 	constants.Surya, constants.Chandra, constants.Kuja, constants.Budha,
 	constants.Guru, constants.Shukra, constants.Shani,
 }
 
 // chartContext is the single, validated view of the chart that every bala
-// reads from. Sign indices follow constants.RaashiOrder (0 = first raashi, Aries).
+// reads from. Sign indices follow constants.RaashiOrder (0 = Aries).
 type chartContext struct {
-	longitude   map[models.Raashyadhipati]float64 // sidereal, normalised 0..360
-	rasiSign    map[models.Raashyadhipati]int     // D1 sign index (from request body)
-	navamsaSign map[models.Raashyadhipati]int     // D9 sign index (from request body)
-	ascSign     int               // lagna sign index (from request body)
-	ascendantLong float64                          // exact lagna longitude
-	chandraWaxing bool
-	speeds        map[models.Raashyadhipati]float64
-	declinations  map[models.Raashyadhipati]float64 // tropical
-	sunriseJD     float64
-	sunsetJD      float64
-	isDayBirth    bool
-	mclong        float64
+	longitude         map[models.Raashyadhipati]float64 // sidereal, 0..360
+	rasiSign          map[models.Raashyadhipati]int     // D1 sign index
+	navamsaSign       map[models.Raashyadhipati]int     // D9 sign index
+	ascSign           int
+	ascendantLong     float64
+	chandraWaxing     bool
+	speeds            map[models.Raashyadhipati]float64
+	declinations      map[models.Raashyadhipati]float64 // tropical
+	eclipticLatitudes map[models.Raashyadhipati]float64
+	sunriseJD         float64
+	sunsetJD          float64
+	isDayBirth        bool
+	mclong            float64
+	birthDateTime     float64 // JD
+	reqLatitude       float64
+	reqLongitude      float64
+	meshaJD           float64
+	solarMonthStartJD float64
 }
 
-// d1Placements / d9Placements pull the placements out of the request body.
 func d1Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string {
 	return map[models.Raashyadhipati]string{
 		constants.Surya:   b.SuryaPlacement,
@@ -57,15 +62,14 @@ func d9Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string
 	}
 }
 
-// newChartContext resolves placements to sign indices and cross-checks them
-// against the longitudes so the two data sources can never silently disagree.
 func newChartContext(in Input) (*chartContext, error) {
 	c := &chartContext{
-		longitude:    make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		rasiSign:     make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
-		navamsaSign:  make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
-		speeds:       make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		declinations: make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		longitude:         make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		rasiSign:          make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
+		navamsaSign:       make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
+		speeds:            make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		declinations:      make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		eclipticLatitudes: make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
 	}
 
 	d1 := d1Placements(in.Chart)
@@ -79,12 +83,15 @@ func newChartContext(in Input) (*chartContext, error) {
 		lon = utils.Normalize360(lon)
 		c.longitude[g] = lon
 
-		// Speeds & Declinations (from the extended PlanetaryData)
 		if in.Planets.Speeds != nil {
 			c.speeds[g] = in.Planets.Speeds[g]
 		}
 		if in.Planets.Declinations != nil {
 			c.declinations[g] = in.Planets.Declinations[g]
+		}
+		// Fixed: previously checked Declinations by mistake
+		if in.Planets.EclipticLatitudes != nil {
+			c.eclipticLatitudes[g] = in.Planets.EclipticLatitudes[g]
 		}
 
 		// D1 validation
@@ -119,26 +126,24 @@ func newChartContext(in Input) (*chartContext, error) {
 		return nil, fmt.Errorf("ascendant: %w", err)
 	}
 	c.ascSign = asc
-
-	// ---------- NEW fields that must come from the upstream ChartResult ----------
-	// You need to pass these through the Input / HouseEffectsReqBody transformation.
-
-	// For now I assume you will add them to Input or to HouseEffectsReqBody.
-	// Example:
-	c.ascendantLong = in.AscendantLong          // you must expose this
+	c.ascendantLong = in.AscendantLong
 	c.chandraWaxing = in.Chart.ChandraWaxing
 	c.sunriseJD = in.SunriseJD
 	c.sunsetJD = in.SunsetJD
 	c.isDayBirth = in.IsDayBirth
 	c.mclong = in.MsLong
+	c.birthDateTime = julianDayUT(in.BirthDateTime)
+	c.reqLatitude = in.Latitude
+	c.reqLongitude = in.Longitude
+	c.meshaJD = in.MeshaJD
+	c.solarMonthStartJD = in.SolarMonthStartJD
 
 	return c, nil
 }
 
-// ---- raashi <-> index, backed by constants.RaashiOrder ---------------------
-func rashiName(idx int) string { 
-	return constants.RaashiOrder[idx]
-}
+// ---- helpers ----------------------------------------------------------------
+
+func rashiName(idx int) string { return constants.RaashiOrder[idx] }
 
 func rashiIndex(name string) (int, error) {
 	for i := range constants.RaashiOrder {
@@ -149,9 +154,6 @@ func rashiIndex(name string) (int, error) {
 	return 0, fmt.Errorf("unknown raashi %q", name)
 }
 
-// ---- small numeric helpers (same logic as int(longitude/30) elsewhere) ------
-
-// signOf returns the sign index of a longitude: int(lon/30), 0..11.
 func signOf(lon float64) int {
 	s := int(utils.Normalize360(lon) / 30)
 	if s > 11 {
@@ -160,12 +162,10 @@ func signOf(lon float64) int {
 	return s
 }
 
-// degreesInSign returns 0..<30 (math.Mod(lon, 30)).
 func degreesInSign(lon float64) float64 {
 	return math.Mod(utils.Normalize360(lon), 30)
 }
 
-// angularDistance returns the shortest arc between two longitudes (0..180).
 func angularDistance(a, b float64) float64 {
 	d := math.Mod(math.Abs(a-b), 360)
 	if d > 180 {
@@ -174,7 +174,27 @@ func angularDistance(a, b float64) float64 {
 	return d
 }
 
-// isOddSign: Aries(0), Gemini(2), Leo(4)... are odd (masculine) signs.
-func isOddSign(sign int) bool { 
-	return sign%2 == 0 
+func angularSeparation(a, b float64) float64 { return angularDistance(a, b) }
+
+func isOddSign(sign int) bool { return sign%2 == 0 }
+
+func isDayPlanet(g models.Raashyadhipati) bool {
+	return g == constants.Surya || g == constants.Guru || g == constants.Shukra
+}
+
+func isNightPlanet(g models.Raashyadhipati) bool {
+	return g == constants.Chandra || g == constants.Kuja || g == constants.Shani
+}
+
+func julianDayUT(t time.Time) float64 {
+	utc := t.UTC()
+	return 2440587.5 +
+		float64(utc.Unix())/86400.0 +
+		float64(utc.Nanosecond())/86400e9
+}
+
+func julianDayToTime(jd float64) time.Time {
+	unixSeconds := (jd - 2440587.5) * 86400
+	sec, nano := math.Modf(unixSeconds)
+	return time.Unix(int64(sec), int64(nano*1e9)).UTC()
 }
