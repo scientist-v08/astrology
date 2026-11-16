@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/scientist-v08/bphs/constants"
 	"github.com/scientist-v08/bphs/models"
 	"github.com/scientist-v08/bphs/services/shadbala"
 	swissEphemeris "github.com/scientist-v08/bphs/services/swiss-ephemeris"
@@ -86,7 +85,6 @@ func DobForAll(c *gin.Context) {
 	result := calculateHouseEffects(&houseEffectsReqBody)
 
 	// 6. Obtain the balas
-	fmt.Println(chart.AscendantLong)
 	balas, err := shadbala.NewService().Calculate(shadbala.Input{
 		Planets: chart.GrahaData, 
 		Chart: *result.Horoscope,
@@ -95,46 +93,23 @@ func DobForAll(c *gin.Context) {
 		SunriseJD:      chart.SunriseJD,
 		SunsetJD:       chart.SunsetJD,
 		IsDayBirth:     chart.IsDayBirth,
+		BirthDateTime:  req.BirthDateTime,
+		Latitude:       req.Latitude,
+		Longitude:      req.Longitude,
+		MeshaJD:           chart.MeshaJD,
+		SolarMonthStartJD: chart.SolarMonthStartJD,
 	})
 	if err != nil {
 		fmt.Printf("Shadbala calculation failed: %v\n", err)
 		return
 	}
-	order := []models.Raashyadhipati{
-		constants.Surya, constants.Chandra, constants.Kuja,
-		constants.Budha, constants.Guru, constants.Shukra, constants.Shani,
-	}
+	bhavaLords := shadbala.ToBhavaLordAndShadBalaReq(houseEffectsReqBody, *balas)
 
-	headers := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
-
-	// Helper to print a row
-	printRow := func(label string, getter func(models.Raashyadhipati) float64) {
-		fmt.Printf("%-12s", label)
-		for _, g := range order {
-			fmt.Printf("%10.2f", getter(g))
-		}
-		fmt.Println()
-	}
-
-	// Header
-	fmt.Printf("%-12s", "")
-	for _, h := range headers {
-		fmt.Printf("%10s", h)
-	}
-	fmt.Println()
-
-	// Separator
-	fmt.Printf("%-12s", "")
-	for range headers {
-		fmt.Printf("%10s", "--------")
-	}
-	fmt.Println()
-
-	// Rows
-	printRow("Sthana", func(g models.Raashyadhipati) float64 { return balas.Sthana[g].Total })
-	printRow("Dig", func(g models.Raashyadhipati) float64 { return balas.Dig.Values[g] })
-	printRow("Drik", func(g models.Raashyadhipati) float64 { return balas.Drik.Values[g] })
+	bhavaLordsResults := sharedBhavaLordsEffects(bhavaLords)
 
 	// 6. Send back the results
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"result":            result,
+		"bhavaLordsResults": bhavaLordsResults,
+	})
 }

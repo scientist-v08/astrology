@@ -38,6 +38,7 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
         Longitudes:   make(map[models.Raashyadhipati]float64),
         Speeds:       make(map[models.Raashyadhipati]float64),
         Declinations: make(map[models.Raashyadhipati]float64),
+        EclipticLatitudes: make(map[models.Raashyadhipati]float64),
     }
 
     flags := swephgo.SeflgSwieph |
@@ -73,6 +74,9 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
 
         data.Longitudes[graha.Name] = longitude
         data.Speeds[graha.Name] = xx[3]
+
+        // xx[1] is ecliptic latitude.
+        data.EclipticLatitudes[graha.Name] = xx[1]
 
         rashiIndex := int(longitude / 30)
 
@@ -324,7 +328,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
 
     // Set True Pushya Paksha Ayanamsha.
     swephgo.SetSidMode(
-        swephgo.SeSidmTruePushya,
+        swephgo.SeSidmLahiri,
         0,
         0,
     )
@@ -378,6 +382,18 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     if moonRashi == "Dhanassu" || moonRashi == "Makara" {
         firstHalf = degreeInSign < 15.0
     }
+
+    sunLon := planetaryData.Longitudes[constants.Surya]
+
+	meshaJD, err := getMeshaSankrantiJD(julianDayUT(birthDetailsReq.BirthDateTime))
+	if err != nil {
+		return  models.ChartResult{}, err
+	}
+
+	solarMonthStartJD, err := getSolarMonthStartJD(julianDayUT(birthDetailsReq.BirthDateTime), sunLon)
+	if err != nil {
+		return  models.ChartResult{}, err
+	}
 
     // -------------------------------------------------
     // 2. Ascendant.
@@ -458,5 +474,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
         SunsetJD:   sunsetJD,
         IsDayBirth: isDayBirth,
         MsLong: msLongitude,
+        MeshaJD: meshaJD,
+	    SolarMonthStartJD: solarMonthStartJD,
     }, nil
 }
