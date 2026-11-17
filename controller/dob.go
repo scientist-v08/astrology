@@ -3,10 +3,12 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/services/geoapify"
 	"github.com/scientist-v08/bphs/services/shadbala"
 	swissEphemeris "github.com/scientist-v08/bphs/services/swiss-ephemeris"
 	"github.com/scientist-v08/bphs/utils"
@@ -112,4 +114,30 @@ func DobForAll(c *gin.Context) {
 		"result":            result,
 		"bhavaLordsResults": bhavaLordsResults,
 	})
+}
+
+func SearchPlaces(ctx *gin.Context) {
+
+    query := strings.TrimSpace(ctx.Query("text"))
+
+    if len(query) < 3 {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "error": "Search query must contain at least 3 characters",
+        })
+        return
+    }
+
+    result, err := geoapify.SearchPlaces(
+        ctx.Request.Context(),
+        query,
+    )
+
+    if err != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{
+            "error": "Unable to retrieve place suggestions",
+        })
+        return
+    }
+
+    ctx.JSON(http.StatusOK, result)
 }

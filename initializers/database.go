@@ -12,6 +12,7 @@ import (
 
 var DB *gorm.DB
 var SK string
+var GeoapifyAPIKey string
 
 func ConnectToDb() {
     var err error
@@ -30,6 +31,12 @@ func ConnectToDb() {
 
     if err != nil {
         log.Fatal("Failed to connect to database")
+    }
+
+	GeoapifyAPIKey = os.Getenv("GEOAPIFY_API_KEY")
+
+    if GeoapifyAPIKey == "" {
+        log.Fatal("GEOAPIFY_API_KEY is not configured")
     }
 
 	// AutoMigrate creates the table if it doesn't exist
