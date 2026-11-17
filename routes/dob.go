@@ -17,4 +17,5 @@ func RegisterDobRoutes(r *gin.Engine) {
 		log.Fatal("Failed to create token maker:", err)
 	}
 	r.POST("/v1/dob", middleware.AuthMiddleware(tokenMaker), controller.DobForAll)
+	r.GET("/v1/autocomplete", middleware.AuthMiddleware(tokenMaker), controller.SearchPlaces)
 }
