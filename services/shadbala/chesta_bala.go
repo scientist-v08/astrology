@@ -1,8 +1,8 @@
-// chesta_bala.go
 package shadbala
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/mshafiee/swephgo"
 	"github.com/scientist-v08/bphs/constants"
@@ -10,36 +10,30 @@ import (
 	"github.com/scientist-v08/bphs/utils"
 )
 
-// ChestaBalaResult holds the final Chesta Bala values (0–60 Virupas).
 type ChestaBalaResult struct {
 	Values map[models.Raashyadhipati]float64 `json:"values"`
 }
 
-// ChestaElements are the three quantities required by BPHS.
 type ChestaElements struct {
 	MeanLongitude float64
 	TrueLongitude float64
 	Seeghrochcha  float64
 }
 
-// calculateChestaBala computes Chesta Bala for all seven grahas.
 func calculateChestaBala(
 	ctx *chartContext,
 	kaala KaalaBalaResult,
 ) ChestaBalaResult {
-
 	res := make(map[models.Raashyadhipati]float64, 7)
 
-	// Sun and Moon special cases.
-	res[constants.Surya] = kaala.Ayana[constants.Surya]
-	res[constants.Chandra] = kaala.Paksha[constants.Chandra]
+	// Sun's Ayana Bala and Moon's Paksha Bala are already doubled (0–120)
+	// in Kaala Bala, so their Chesta Bala is 0 to avoid double-counting.
+	res[constants.Surya] = 0
+	res[constants.Chandra] = 0
 
 	elements, err := computeChestaElements(ctx)
 	if err != nil {
-		// Preserve the error for debugging rather than silently
-		// pretending that the calculated Bala is zero.
 		fmt.Printf("Chesta Bala calculation failed: %v\n", err)
-
 		for _, g := range []models.Raashyadhipati{
 			constants.Kuja,
 			constants.Budha,
@@ -49,35 +43,25 @@ func calculateChestaBala(
 		} {
 			res[g] = 0
 		}
-
 		return ChestaBalaResult{Values: res}
 	}
 
 	for g, e := range elements {
-		res[g] = chestaBala(
-			e.Seeghrochcha,
-			e.MeanLongitude,
-			e.TrueLongitude,
-		)
+		res[g] = chestaBala(e.Seeghrochcha, e.MeanLongitude, e.TrueLongitude)
 	}
+	fmt.Println(res)
 
 	return ChestaBalaResult{Values: res}
 }
 
-// chestaBala implements the Chesta Kendra formula.
-//
-// Chesta Kendra = Seeghrochcha - average(mean, true)
-// Fold to 0–180 degrees, divide by 3.
-func chestaBala(
-	seeghrochcha float64,
-	meanLon float64,
-	trueLon float64,
-) float64 {
-
+func chestaBala(seeghrochcha, meanLon, trueLon float64) float64 {
+	// Circular midpoint to handle 0°/360° wraparound safely.
 	avg := (meanLon + trueLon) / 2.0
+	if math.Abs(meanLon-trueLon) > 180.0 {
+		avg = utils.Normalize360(avg + 180.0)
+	}
 
 	kendra := utils.Normalize360(seeghrochcha - avg)
-
 	if kendra > 180.0 {
 		kendra = 360.0 - kendra
 	}
@@ -85,101 +69,78 @@ func chestaBala(
 	return kendra / 3.0
 }
 
-// computeChestaElements calculates Chesta Bala inputs.
-//
-// Convention:
-//   Mars, Jupiter, Saturn:
-//       Mean longitude = Mean Sun
-//       Seeghrochcha = Mean Sun
-//
-//   Mercury, Venus:
-//       Mean longitude = Mean Sun
-//       Seeghrochcha = Own mean heliocentric longitude
-//
-// NOTE: This is a practical approximation, not yet a verified
-// reproduction of Jagannatha Hora's internal calculation.
-
 func computeChestaElements(
-    ctx *chartContext,
+	ctx *chartContext,
 ) (map[models.Raashyadhipati]ChestaElements, error) {
+	jd := ctx.birthDateTime
+	ayanamsha := swephgo.GetAyanamsaUt(jd)
 
-    jd := ctx.birthDateTime
+	toSidereal := func(lon float64) float64 {
+		return utils.Normalize360(lon - ayanamsha)
+	}
 
-    // 1. Obtain the ayanamsha for the birth moment.
-    // Swiss Ephemeris uses the currently configured sidereal mode.
-    ayanamsha := swephgo.GetAyanamsaUt(jd)
+	meanSun, err := meanSunLongitude(jd)
+	if err != nil {
+		return nil, fmt.Errorf("mean Sun: %w", err)
+	}
+	meanMars, err := meanLongitude(jd, swephgo.SeMars)
+	if err != nil {
+		return nil, fmt.Errorf("mean Mars: %w", err)
+	}
+	meanMerc, err := meanLongitude(jd, swephgo.SeMercury)
+	if err != nil {
+		return nil, fmt.Errorf("mean Mercury: %w", err)
+	}
+	meanJup, err := meanLongitude(jd, swephgo.SeJupiter)
+	if err != nil {
+		return nil, fmt.Errorf("mean Jupiter: %w", err)
+	}
+	meanVen, err := meanLongitude(jd, swephgo.SeVenus)
+	if err != nil {
+		return nil, fmt.Errorf("mean Venus: %w", err)
+	}
+	meanSat, err := meanLongitude(jd, swephgo.SeSaturn)
+	if err != nil {
+		return nil, fmt.Errorf("mean Saturn: %w", err)
+	}
 
-    // Convert tropical longitude to sidereal longitude.
-    toSidereal := func(lon float64) float64 {
-        return utils.Normalize360(lon - ayanamsha)
-    }
+	meanSun = toSidereal(meanSun)
+	meanMars = toSidereal(meanMars)
+	meanMerc = toSidereal(meanMerc)
+	meanJup = toSidereal(meanJup)
+	meanVen = toSidereal(meanVen)
+	meanSat = toSidereal(meanSat)
 
-    // 2. Calculate mean longitude of the Sun.
-    meanSun, err := meanSunLongitude(jd)
-    if err != nil {
-        return nil, fmt.Errorf("mean Sun: %w", err)
-    }
-
-    // 3. Calculate mean heliocentric longitudes.
-    meanMerc, err := meanLongitude(jd, swephgo.SeMercury)
-    if err != nil {
-        return nil, fmt.Errorf("mean Mercury: %w", err)
-    }
-
-    meanVen, err := meanLongitude(jd, swephgo.SeVenus)
-    if err != nil {
-        return nil, fmt.Errorf("mean Venus: %w", err)
-    }
-
-    // 4. Convert tropical mean longitudes to sidereal.
-    meanSun = toSidereal(meanSun)
-    meanMerc = toSidereal(meanMerc)
-    meanVen = toSidereal(meanVen)
-
-    // 5. Obtain true sidereal longitudes from chart context.
-    trueMars := ctx.longitude[constants.Kuja]
-    trueMerc := ctx.longitude[constants.Budha]
-    trueJup := ctx.longitude[constants.Guru]
-    trueVen := ctx.longitude[constants.Shukra]
-    trueSat := ctx.longitude[constants.Shani]
-
-    // 6. Assemble Chesta Bala elements.
-    elements := map[models.Raashyadhipati]ChestaElements{
-
-        constants.Kuja: {
-            MeanLongitude: meanSun,
-            TrueLongitude: trueMars,
-            Seeghrochcha:  meanSun,
-        },
-
-        constants.Budha: {
-            MeanLongitude: meanSun,
-            TrueLongitude: trueMerc,
-            Seeghrochcha:  meanMerc,
-        },
-
-        constants.Guru: {
-            MeanLongitude: meanSun,
-            TrueLongitude: trueJup,
-            Seeghrochcha:  meanSun,
-        },
-
-        constants.Shukra: {
-            MeanLongitude: meanSun,
-            TrueLongitude: trueVen,
-            Seeghrochcha:  meanVen,
-        },
-
-        constants.Shani: {
-            MeanLongitude: meanSun,
-            TrueLongitude: trueSat,
-            Seeghrochcha:  meanSun,
-        },
-    }
-
-    return elements, nil
+	return map[models.Raashyadhipati]ChestaElements{
+		// Outer planets: own mean longitude, Sun as Seeghrochcha
+		constants.Kuja: {
+			MeanLongitude: meanMars,
+			TrueLongitude: ctx.longitude[constants.Kuja],
+			Seeghrochcha:  meanSun,
+		},
+		constants.Guru: {
+			MeanLongitude: meanJup,
+			TrueLongitude: ctx.longitude[constants.Guru],
+			Seeghrochcha:  meanSun,
+		},
+		constants.Shani: {
+			MeanLongitude: meanSat,
+			TrueLongitude: ctx.longitude[constants.Shani],
+			Seeghrochcha:  meanSun,
+		},
+		// Inner planets: Sun as mean longitude, own mean heliocentric longitude as Seeghrochcha
+		constants.Budha: {
+			MeanLongitude: meanSun,
+			TrueLongitude: ctx.longitude[constants.Budha],
+			Seeghrochcha:  meanMerc,
+		},
+		constants.Shukra: {
+			MeanLongitude: meanSun,
+			TrueLongitude: ctx.longitude[constants.Shukra],
+			Seeghrochcha:  meanVen,
+		},
+	}, nil
 }
-
 
 // meanSunLongitude obtains the Sun's mean longitude.
 //
