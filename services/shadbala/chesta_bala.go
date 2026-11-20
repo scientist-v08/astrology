@@ -49,7 +49,6 @@ func calculateChestaBala(
 	for g, e := range elements {
 		res[g] = chestaBala(e.Seeghrochcha, e.MeanLongitude, e.TrueLongitude)
 	}
-	fmt.Println(res)
 
 	return ChestaBalaResult{Values: res}
 }
