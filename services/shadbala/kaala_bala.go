@@ -26,11 +26,11 @@ type KaalaBalaResult struct {
 
 // weekdayFromJD returns the planetary lord of the civil day containing the JD
 // (Sunday = Surya … Saturday = Shani). Uses the standard astronomical convention.
-func weekdayFromJD(jd float64) models.Raashyadhipati {
+func weekdayFromJD(jd, lon float64) models.Raashyadhipati {
 	// Floor(JD + 0.5) gives the civil day number; JD 0.0 was a Monday.
-	jdn := int64(math.Floor(jd + 0.5))
-	// We want: 0 = Sunday, 1 = Monday … 6 = Saturday
+	jdn := int64(math.Floor(jd + lon/360.0 + 0.5))
 	rem := (jdn + 1) % 7
+	// We want: 0 = Sunday, 1 = Monday … 6 = Saturday
 	switch rem {
 	case 0:
 		return constants.Surya
@@ -50,38 +50,38 @@ func weekdayFromJD(jd float64) models.Raashyadhipati {
 }
 
 // weekdayLord is the same as weekdayFromJD but used for Hora sequence start.
-func weekdayLord(jd float64) models.Raashyadhipati { return weekdayFromJD(jd) }
+func weekdayLord(jd, lon float64) models.Raashyadhipati { return weekdayFromJD(jd, lon) }
 
-func calculateAbdaBala(meshaSankrantiJD float64) map[models.Raashyadhipati]float64 {
+func calculateAbdaBala(meshaSankrantiJD, lon float64) map[models.Raashyadhipati]float64 {
 	res := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
 		res[g] = 0
 	}
 	if meshaSankrantiJD > 0 {
-		lord := weekdayFromJD(meshaSankrantiJD)
+		lord := weekdayFromJD(meshaSankrantiJD, lon)
 		res[lord] = 15.0
 	}
 	return res
 }
 
-func calculateMasaBala(solarMonthEntryJD float64) map[models.Raashyadhipati]float64 {
+func calculateMasaBala(solarMonthEntryJD, lon float64) map[models.Raashyadhipati]float64 {
 	res := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
 		res[g] = 0
 	}
 	if solarMonthEntryJD > 0 {
-		lord := weekdayFromJD(solarMonthEntryJD)
+		lord := weekdayFromJD(solarMonthEntryJD, lon)
 		res[lord] = 30.0
 	}
 	return res
 }
 
-func calculateVaraBala(sunriseJD float64) map[models.Raashyadhipati]float64 {
+func calculateVaraBala(sunriseJD, lon float64) map[models.Raashyadhipati]float64 {
 	res := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
 		res[g] = 0
 	}
-	lord := weekdayFromJD(sunriseJD)
+	lord := weekdayFromJD(sunriseJD, lon)
 	res[lord] = 45.0
 	return res
 }
@@ -128,7 +128,7 @@ func getBirthSunriseInterval(ctx *chartContext, birthJD, lat, lon float64) (floa
 	return startJD, next, nil
 }
 
-func calculateHoraBala(birthJD, sunriseJD, nextSunriseJD float64) (map[models.Raashyadhipati]float64, error) {
+func calculateHoraBala(birthJD, sunriseJD, nextSunriseJD, lon float64) (map[models.Raashyadhipati]float64, error) {
 	res := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
 		res[g] = 0
@@ -154,7 +154,7 @@ func calculateHoraBala(birthJD, sunriseJD, nextSunriseJD float64) (map[models.Ra
 		constants.Surya, constants.Shukra, constants.Budha, constants.Chandra,
 	}
 
-	dayLord := weekdayLord(sunriseJD)
+	dayLord := weekdayLord(sunriseJD, lon)
 	startIndex := -1
 	for i, g := range horaSequence {
 		if g == dayLord {
@@ -251,10 +251,8 @@ func calculatePakshaBala(ctx *chartContext) map[models.Raashyadhipati]float64 {
 		switch g {
 		case constants.Chandra:
 			res[g] = 2 * base
-		case constants.Guru, constants.Shukra:
+		case constants.Budha, constants.Guru, constants.Shukra:
 			res[g] = base
-		case constants.Budha:
-			if mercuryIsBenefic(ctx) { res[g] = base } else { res[g] = 60 - base }
 		default: // Surya, Kuja, Shani
 			res[g] = 60 - base
 		}
@@ -263,7 +261,7 @@ func calculatePakshaBala(ctx *chartContext) map[models.Raashyadhipati]float64 {
 }
 
 // Mercury is a malefic when it shares a sign with a malefic.
-func mercuryIsBenefic(ctx *chartContext) bool {
+/*func mercuryIsBenefic(ctx *chartContext) bool {
 	sign := func(g models.Raashyadhipati) int { return int(ctx.longitude[g] / 30) }
 	m := sign(constants.Budha)
 	for _, g := range []models.Raashyadhipati{constants.Surya, constants.Kuja, constants.Shani} {
@@ -272,7 +270,7 @@ func mercuryIsBenefic(ctx *chartContext) bool {
 		}
 	}
 	return true
-}
+}*/
 
 func calculateTribhagaBala(ctx *chartContext, birthJD, lat, lon float64) (map[models.Raashyadhipati]float64, error) {
 	res := make(map[models.Raashyadhipati]float64, 7)
@@ -431,15 +429,15 @@ func calculateKaalaBala(ctx *chartContext, planets models.PlanetaryData) KaalaBa
 	pak := calculatePakshaBala(ctx)
 	tri, _ := calculateTribhagaBala(ctx, ctx.birthDateTime, ctx.reqLatitude, ctx.reqLongitude)
 	aya := calculateAyanaBala(ctx)
-	abda := calculateAbdaBala(ctx.meshaJD)
-	masa := calculateMasaBala(ctx.solarMonthStartJD)
-	vara := calculateVaraBala(ctx.sunriseJD)
-
+	abda := calculateAbdaBala(ctx.meshaJD, ctx.reqLongitude)
+	masa := calculateMasaBala(ctx.solarMonthStartJD, ctx.reqLongitude)
+	
 	// Hora needs the sunrise interval that actually contains the birth
 	sunriseStart, nextSunrise, err := getBirthSunriseInterval(ctx, ctx.birthDateTime, ctx.reqLatitude, ctx.reqLongitude)
+	vara := calculateVaraBala(sunriseStart, ctx.reqLongitude)
 	var hora map[models.Raashyadhipati]float64
 	if err == nil {
-		hora, _ = calculateHoraBala(ctx.birthDateTime, sunriseStart, nextSunrise)
+		hora, _ = calculateHoraBala(ctx.birthDateTime, sunriseStart, nextSunrise, ctx.reqLongitude)
 	} else {
 		hora = make(map[models.Raashyadhipati]float64)
 		for _, g := range shadbalaGrahas {
@@ -456,7 +454,7 @@ func calculateKaalaBala(ctx *chartContext, planets models.PlanetaryData) KaalaBa
 
 	total := make(map[models.Raashyadhipati]float64, 7)
 	for _, g := range shadbalaGrahas {
-		total[g] = nath[g] + pak[g] + tri[g] +
+		total[g] = nath[g] + pak[g] + tri[g] + aya[g] +
 			abda[g] + masa[g] + vara[g] + hora[g]
 	}
 

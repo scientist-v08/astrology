@@ -19,6 +19,7 @@ func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) 
 	// Naisargika Bala in Virupas matching the exact graha order above:
 	// Surya (60), Chandra (51.43), Kuja (17.14), Budha (25.71), Guru (34.29), Shukra (42.86), Shani (8.57)
 	naisargikaBala := []float64{60.0, 51.43, 17.14, 25.71, 34.29, 42.86, 8.57}
+	minRequired := []float64{300, 360, 300, 420, 390, 330, 300}
 
 	sthanaBala := make([]float32, len(order))
 	kaalaBala := make([]float32, len(order))
@@ -35,11 +36,12 @@ func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) 
 
 		// Total Shadbala is the sum of all 6 strengths (Sthana, Dig, Kaala, Chesta, Naisargika, Drik)
 		totalShadbala := sthana + dig + kaala + chesta + naisargika + drig
+		shadbalaPercent := (totalShadbala / minRequired[i]) * 100
 
 		sthanaBala[i] = float32(sthana)
 		kaalaBala[i] = float32(kaala)
 		drigBala[i] = float32(drig)
-		shadBala[i] = float32(totalShadbala)
+		shadBala[i] = float32(shadbalaPercent)
 	}
 
 	return models.BhavaLordAndShadBalaReqBody{
