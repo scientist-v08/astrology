@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-type HouseEffectProportion map[models.AllRaashis][]int8
+type HouseEffectProportion map[dto.AllRaashis][]int8
 type SpecialHouseEffectProportion map[string][]int8
 
 var HouseeffectProprtionStore = HouseEffectProportion{

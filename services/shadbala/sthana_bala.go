@@ -2,14 +2,14 @@ package shadbala
 
 import (
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 // Sthana Bala = Uchcha + Saptavargaja + Ojayugma-rasyamsa + Kendradi + Drekkana
 // All values are in Virupas (60 Virupas = 1 Rupa).
 
 // Minimum Sthana Bala required (Virupas) - Parashara, as tabulated in the book.
-var sthanaMinimum = map[models.Raashyadhipati]float64{
+var sthanaMinimum = map[dto.Raashyadhipati]float64{
 	constants.Surya:   165,
 	constants.Chandra: 133,
 	constants.Kuja:    96,
@@ -21,7 +21,7 @@ var sthanaMinimum = map[models.Raashyadhipati]float64{
 
 // Debilitation points (exaltation point + 180), sidereal degrees.
 // Exaltation: Sun 10 Ari, Moon 3 Tau, Mars 28 Cap, Mer 15 Vir, Jup 5 Can, Ven 27 Pis, Sat 20 Lib.
-var debilitationPoint = map[models.Raashyadhipati]float64{
+var debilitationPoint = map[dto.Raashyadhipati]float64{
 	constants.Surya:   190,
 	constants.Chandra: 213,
 	constants.Kuja:    118,
@@ -58,7 +58,7 @@ type SthanaBala struct {
 }
 
 // SthanaBalaResult is keyed by graha.
-type SthanaBalaResult map[models.Raashyadhipati]SthanaBala
+type SthanaBalaResult map[dto.Raashyadhipati]SthanaBala
 
 // calculateSthanaBala computes Sthana Bala for the seven grahas.
 //
@@ -92,14 +92,14 @@ func calculateSthanaBala(ctx *chartContext) SthanaBalaResult {
 
 // uchchaBala: distance from the debilitation point (shortest arc, max 180) / 3.
 // 0 at debilitation, 60 at exaltation.
-func uchchaBala(g models.Raashyadhipati, lon float64) float64 {
+func uchchaBala(g dto.Raashyadhipati, lon float64) float64 {
 	return angularDistance(lon, debilitationPoint[g]) / 3
 }
 
 // ojaYugmaBala: 15 Virupas for the D1 placement and 15 for the D9 placement
 // in the "right" polarity. Moon and Venus like even (yugma) signs; the rest
 // (Sun, Mars, Jupiter, Mercury, Saturn) like odd (oja) signs.
-func ojaYugmaBala(g models.Raashyadhipati, rasiSign, navamsaSign int) float64 {
+func ojaYugmaBala(g dto.Raashyadhipati, rasiSign, navamsaSign int) float64 {
 	female := g == constants.Chandra || g == constants.Shukra
 	total := 0.0
 	for _, sign := range []int{rasiSign, navamsaSign} {
@@ -129,12 +129,12 @@ func kendradiBala(planetSign, ascSign int) float64 {
 // Sun/Mars/Jupiter: 1st Drekkana
 // Moon/Venus:       2nd Drekkana
 // Mercury/Saturn:   3rd Drekkana
-func drekkanaBala(g models.Raashyadhipati, lon float64) float64 {
+func drekkanaBala(g dto.Raashyadhipati, lon float64) float64 {
     decanate := int(degreesInSign(lon) / 10)
 	if decanate > 2 {
 		decanate = 2
 	}
-	want := map[models.Raashyadhipati]int{
+	want := map[dto.Raashyadhipati]int{
 		constants.Surya: 0, constants.Kuja: 0, constants.Guru: 0,
 		constants.Chandra: 1, constants.Shukra: 1,
 		constants.Budha: 2, constants.Shani: 2,

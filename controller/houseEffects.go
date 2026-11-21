@@ -8,8 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
-	"github.com/scientist-v08/bphs/services"
+	"github.com/scientist-v08/bphs/dto"
+	"github.com/scientist-v08/bphs/services/bhavaLords"
+	"github.com/scientist-v08/bphs/services/houses"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -37,29 +38,29 @@ func getShadBalaStyleComment(score int8) string {
 func getBhavaLordEffect(house int8, lordPlacement int8) string {
 	switch house {
 	case 1:
-		return services.FirstBhavaLordEffect(lordPlacement)
+		return bhavaLords.FirstBhavaLordEffect(lordPlacement)
 	case 2:
-		return services.SecondBhavaLordEffect(lordPlacement)
+		return bhavaLords.SecondBhavaLordEffect(lordPlacement)
 	case 3:
-		return services.ThirdBhavaLordEffect(lordPlacement)
+		return bhavaLords.ThirdBhavaLordEffect(lordPlacement)
 	case 4:
-		return services.FourthBhavaLordEffect(lordPlacement)
+		return bhavaLords.FourthBhavaLordEffect(lordPlacement)
 	case 5:
-		return services.FifthBhavaLordEffect(lordPlacement)
+		return bhavaLords.FifthBhavaLordEffect(lordPlacement)
 	case 6:
-		return services.SixthBhavaLordEffect(lordPlacement)
+		return bhavaLords.SixthBhavaLordEffect(lordPlacement)
 	case 7:
-		return services.SeventhBhavaLordEffect(lordPlacement)
+		return bhavaLords.SeventhBhavaLordEffect(lordPlacement)
 	case 8:
-		return services.EighthBhavaLordEffect(lordPlacement)
+		return bhavaLords.EighthBhavaLordEffect(lordPlacement)
 	case 9:
-		return services.NinthBhavaLordEffect(lordPlacement)
+		return bhavaLords.NinthBhavaLordEffect(lordPlacement)
 	case 10:
-		return services.TenthBhavaLordEffect(lordPlacement)
+		return bhavaLords.TenthBhavaLordEffect(lordPlacement)
 	case 11:
-		return services.EleventhBhavaLordEffect(lordPlacement)
+		return bhavaLords.EleventhBhavaLordEffect(lordPlacement)
 	case 12:
-		return services.TwelfthBhavaLordEffect(lordPlacement)
+		return bhavaLords.TwelfthBhavaLordEffect(lordPlacement)
 	default:
 		return "" // invalid house
 	}
@@ -67,44 +68,44 @@ func getBhavaLordEffect(house int8, lordPlacement int8) string {
 
 func getBhavaEffect(
 	house int8,
-	req *models.HouseEffectsReqBody,
+	req *dto.HouseEffectsReqBody,
 	housePlacements *map[string]int16,
-	guruAspects *[]models.AllRaashis,
-	shaniAspects *[]models.AllRaashis,
-	kujaAspects *[]models.AllRaashis,
+	guruAspects *[]dto.AllRaashis,
+	shaniAspects *[]dto.AllRaashis,
+	kujaAspects *[]dto.AllRaashis,
 ) []string {
    switch house {
 	case 1:
-		return services.FirstHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.FirstHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 2:
-		return services.SecondHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.SecondHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 3:
-		return services.ThirdHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.ThirdHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 4:
-		return services.FourthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.FourthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 5:
-		return services.FifthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.FifthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 6:
-		return services.SixthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.SixthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 7:
-		return services.SeventhHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.SeventhHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 8:
-		return services.EighthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.EighthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 9:
-		return services.NinthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.NinthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 10:
-		return services.TenthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.TenthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 11:
-		return services.EleventHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.EleventHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	case 12:
-		return services.TwelfthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
+		return houses.TwelfthHouseEffects(req, housePlacements, guruAspects, shaniAspects, kujaAspects)
 	default:
 		return []string{}
 	}
 }
 
-func buildKarakamshaReqBody(req models.HouseEffectsReqBody) models.KarakamshaReqBody {
-	return models.KarakamshaReqBody{
+func buildKarakamshaReqBody(req dto.HouseEffectsReqBody) dto.KarakamshaReqBody {
+	return dto.KarakamshaReqBody{
 		Ascendant:        req.NavAscendant,
 		Karakamsha:       req.Karakamsha,
 		Surya:            req.NavSuryaPlacement,
@@ -141,7 +142,7 @@ func ToIndexedStrings(input []string) []IndexedString {
 
 func GetAllHouseEffects(c *gin.Context) {
 	// 1. Obtain the request body from the post request and validate them.
-	var req models.HouseEffectsReqBody
+	var req dto.HouseEffectsReqBody
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		// err will be validator.ValidationErrors if validation failed
@@ -168,8 +169,8 @@ func GetAllHouseEffects(c *gin.Context) {
 		return
 	}
 
-	rahu := models.AllRaashis(req.RahuPlacement)
-	ketu := models.AllRaashis(req.KetuPlacement)
+	rahu := dto.AllRaashis(req.RahuPlacement)
+	ketu := dto.AllRaashis(req.KetuPlacement)
 
 	if ketu != constants.OppositeAspectsStore[rahu] {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -187,7 +188,7 @@ func GetAllHouseEffects(c *gin.Context) {
 }
 
 func GetBhavaLordEffects(c *gin.Context) {
-	var req models.BhavaLordEffectsReqBody
+	var req dto.BhavaLordEffectsReqBody
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		// err will be validator.ValidationErrors if validation failed
@@ -214,14 +215,14 @@ func GetBhavaLordEffects(c *gin.Context) {
 		return
 	}
 
-	ascendant := models.AllRaashis(req.Ascendant)
+	ascendant := dto.AllRaashis(req.Ascendant)
 
 	// Get the house map for this ascendant
 	housesByPlanet := constants.AscendantToRashyadhipatiMapStore[ascendant]
 	effects := []string{}
 
 	addEffects := func(planetStr string, placement int8) {
-		planet := models.Raashyadhipati(planetStr)
+		planet := dto.Raashyadhipati(planetStr)
 		houses := housesByPlanet[planet]
 
 		for _, houseNum := range houses {
@@ -243,7 +244,7 @@ func GetBhavaLordEffects(c *gin.Context) {
 }
 
 func BhavaLordEffectsHandler(c *gin.Context) {
-	var req models.BhavaLordAndShadBalaReqBody
+	var req dto.BhavaLordAndShadBalaReqBody
 	if err := c.ShouldBindJSON(&req); err != nil {
 		// err will be validator.ValidationErrors if validation failed
 		var errs []string
@@ -270,11 +271,11 @@ func BhavaLordEffectsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, sharedBhavaLordsEffects(req))
 }
 
-func sharedBhavaLordsEffects(req models.BhavaLordAndShadBalaReqBody) map[string]any {
+func sharedBhavaLordsEffects(req dto.BhavaLordAndShadBalaReqBody) map[string]any {
 	grahas := []string{"Surya", "Chandra", "Kuja", "Budha", "Guru", "Shukra", "Shani"}
-	allGrahaDefined := make([]models.ShadBalaResField, 7)
-	allGrahaDefinedSthana := make([]models.ShadBalaResField, 7)
-	allGrahaDefinedKaala := make([]models.ShadBalaResField, 7)
+	allGrahaDefined := make([]dto.ShadBalaResField, 7)
+	allGrahaDefinedSthana := make([]dto.ShadBalaResField, 7)
+	allGrahaDefinedKaala := make([]dto.ShadBalaResField, 7)
 	effectiveSthanaBala := make([]float32, 7)
 	effectiveKaalaBala := make([]float32, 7)
 	SthanaBalaMinimums := []float32{165.0,133.0,96.0,165.0,165.0,133.0,96.0}
@@ -290,17 +291,17 @@ func sharedBhavaLordsEffects(req models.BhavaLordAndShadBalaReqBody) map[string]
 		effectiveKaalaBala[i] = sumOfKaala[i] / KaalaBalaMinimums[i]
 	}
 	for i := range 7 {
-		allGrahaDefined[i] = models.ShadBalaResField{
+		allGrahaDefined[i] = dto.ShadBalaResField{
 			Graha:         grahas[i],
 			EffectiveBala: req.ShadBala[i],
 			Rank:          0,
 		}
-		allGrahaDefinedSthana[i] = models.ShadBalaResField{
+		allGrahaDefinedSthana[i] = dto.ShadBalaResField{
 			Graha:         grahas[i],
 			EffectiveBala: effectiveSthanaBala[i],
 			Rank:          0,
 		}
-		allGrahaDefinedKaala[i] = models.ShadBalaResField{
+		allGrahaDefinedKaala[i] = dto.ShadBalaResField{
 			Graha:         grahas[i],
 			EffectiveBala: effectiveKaalaBala[i],
 			Rank:          0,
@@ -364,10 +365,10 @@ func sharedBhavaLordsEffects(req models.BhavaLordAndShadBalaReqBody) map[string]
 	top3SthanaLords := "The native will obtain the highest level of mental satisfaction / success in " + constants.Themes[housePlacements[allGrahaDefinedSthana[0].Graha]-1] +
 	 " and will dedicate his highest thinking towards " + constants.Themes[housePlacements[allGrahaDefinedSthana[1].Graha]-1]
 
-	housesByPlanet := constants.AscendantToRashyadhipatiMapStore[models.AllRaashis(req.Ascendant)]
+	housesByPlanet := constants.AscendantToRashyadhipatiMapStore[dto.AllRaashis(req.Ascendant)]
 	effects := []string{}
 	addEffects := func(planetStr string, placement int8) {
-		planet := models.Raashyadhipati(planetStr)
+		planet := dto.Raashyadhipati(planetStr)
 		houses := housesByPlanet[planet]
 		for _, houseNum := range houses {
 			effect := getBhavaLordEffect(houseNum, placement)

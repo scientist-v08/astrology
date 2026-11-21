@@ -9,7 +9,7 @@ import (
 
 	"github.com/mshafiee/swephgo"
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -18,9 +18,9 @@ func angularDistance(a, b float64) float64 {
     return math.Abs(d)
 }
 
-func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
+func calculatePlanetaryLongitudes(jd float64) (dto.PlanetaryData, error) {
     grahas := []struct {
-        Name   models.Raashyadhipati
+        Name   dto.Raashyadhipati
         Planet int
     }{
         {constants.Surya, swephgo.SeSun},
@@ -33,12 +33,12 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
         {constants.Rahu, swephgo.SeTrueNode},
     }
 
-    data := models.PlanetaryData{
-        Rashis:       make(models.GrahaPositions),
-        Longitudes:   make(map[models.Raashyadhipati]float64),
-        Speeds:       make(map[models.Raashyadhipati]float64),
-        Declinations: make(map[models.Raashyadhipati]float64),
-        EclipticLatitudes: make(map[models.Raashyadhipati]float64),
+    data := dto.PlanetaryData{
+        Rashis:       make(dto.GrahaPositions),
+        Longitudes:   make(map[dto.Raashyadhipati]float64),
+        Speeds:       make(map[dto.Raashyadhipati]float64),
+        Declinations: make(map[dto.Raashyadhipati]float64),
+        EclipticLatitudes: make(map[dto.Raashyadhipati]float64),
     }
 
     flags := swephgo.SeflgSwieph |
@@ -64,7 +64,7 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
 		errMsg := string(bytes.Trim(serr, "\x00"))
 
         if ret < 0 {
-            return models.PlanetaryData{}, fmt.Errorf(
+            return dto.PlanetaryData{}, fmt.Errorf(
                 "failed to calculate %s (planet id %d): %s",
 				graha.Name, graha.Planet, errMsg,
             )
@@ -88,7 +88,7 @@ func calculatePlanetaryLongitudes(jd float64) (models.PlanetaryData, error) {
 		retEq := swephgo.CalcUt(jd, graha.Planet, eqFlags, xxEq, serrEq)
 		errMsgEq := string(bytes.Trim(serrEq, "\x00"))
 		if retEq < 0 {
-			return models.PlanetaryData{}, fmt.Errorf(
+			return dto.PlanetaryData{}, fmt.Errorf(
 				"failed to calculate %s (equatorial): %s", graha.Name, errMsgEq,
 			)
 		}
@@ -150,18 +150,18 @@ func calculateAscendant(
 
 func calculateNavamshaPlacements(
     ascLongitude float64,
-    longitudes map[models.Raashyadhipati]float64,
-) (models.NavamshaData, error) {
+    longitudes map[dto.Raashyadhipati]float64,
+) (dto.NavamshaData, error) {
 
-    data := models.NavamshaData{
-        Rashis: make(models.GrahaPositions),
+    data := dto.NavamshaData{
+        Rashis: make(dto.GrahaPositions),
     }
 
     // Navamsha Ascendant.
     navAscendant, err := utils.CalculateNavamsha(ascLongitude)
 
     if err != nil {
-        return models.NavamshaData{}, fmt.Errorf(
+        return dto.NavamshaData{}, fmt.Errorf(
             "failed to calculate Navamsha Ascendant: %w",
             err,
         )
@@ -175,7 +175,7 @@ func calculateNavamshaPlacements(
         navRashi, err := utils.CalculateNavamsha(longitude)
 
         if err != nil {
-            return models.NavamshaData{}, fmt.Errorf(
+            return dto.NavamshaData{}, fmt.Errorf(
                 "failed to calculate Navamsha for %v: %w",
                 graha,
                 err,
@@ -189,11 +189,11 @@ func calculateNavamshaPlacements(
 }
 
 func calculateCombustion(
-    longitudes map[models.Raashyadhipati]float64,
-    speeds map[models.Raashyadhipati]float64,
-) map[models.Raashyadhipati]bool {
+    longitudes map[dto.Raashyadhipati]float64,
+    speeds map[dto.Raashyadhipati]float64,
+) map[dto.Raashyadhipati]bool {
 
-    thresholds := map[models.Raashyadhipati]float64{
+    thresholds := map[dto.Raashyadhipati]float64{
         constants.Chandra: 12,
         constants.Kuja:    17,
         constants.Guru:    11,
@@ -201,7 +201,7 @@ func calculateCombustion(
     }
 
     combustion := make(
-        map[models.Raashyadhipati]bool,
+        map[dto.Raashyadhipati]bool,
     )
 
     sunLongitude := longitudes[constants.Surya]
@@ -242,7 +242,7 @@ func calculateCombustion(
 }
 
 func calculatePaksha(
-    longitudes map[models.Raashyadhipati]float64,
+    longitudes map[dto.Raashyadhipati]float64,
 ) (string, bool) {
 
     elongation := utils.Normalize360(
@@ -312,13 +312,13 @@ func calculateSunTimes(jd, longitude, latitude float64) (sunriseJD, sunsetJD flo
 
 var swephMutex sync.Mutex
 
-func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartResult, error) {
+func CalculateGrahaRashis(birthDetailsReq dto.BirthChartReq) (dto.ChartResult, error) {
 	swephMutex.Lock()
     defer swephMutex.Unlock()
 
     ephePath, err := filepath.Abs("./ephe")
     if err != nil {
-        return models.ChartResult{}, fmt.Errorf(
+        return dto.ChartResult{}, fmt.Errorf(
             "failed to resolve ephemeris directory: %w", err,
         )
     }
@@ -359,7 +359,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
         birthDetailsReq.Latitude,
     )
     if err != nil {
-        return models.ChartResult{}, err
+        return dto.ChartResult{}, err
     }
 
     // -------------------------------------------------
@@ -368,11 +368,11 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
 
     planetaryData, err := calculatePlanetaryLongitudes(jd)
     if err != nil {
-        return models.ChartResult{}, err
+        return dto.ChartResult{}, err
     }
     moonLong, ok := planetaryData.Longitudes[constants.Chandra]
     if !ok {
-        return models.ChartResult{}, fmt.Errorf("moon longitude not found")
+        return dto.ChartResult{}, fmt.Errorf("moon longitude not found")
     }
 
     moonRashi := constants.RaashiOrder[int(moonLong/30.0)]
@@ -387,12 +387,12 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
 
 	meshaJD, err := getMeshaSankrantiJD(julianDayUT(birthDetailsReq.BirthDateTime))
 	if err != nil {
-		return  models.ChartResult{}, err
+		return  dto.ChartResult{}, err
 	}
 
 	solarMonthStartJD, err := getSolarMonthStartJD(julianDayUT(birthDetailsReq.BirthDateTime), sunLon)
 	if err != nil {
-		return  models.ChartResult{}, err
+		return  dto.ChartResult{}, err
 	}
 
     // -------------------------------------------------
@@ -406,7 +406,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     )
 
     if err != nil {
-        return models.ChartResult{}, err
+        return dto.ChartResult{}, err
     }
 
     ascendant := constants.RaashiOrder[int(ascLongitude/30)]
@@ -421,7 +421,7 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     )
 
     if err != nil {
-        return models.ChartResult{}, err
+        return dto.ChartResult{}, err
     }
 
     // -------------------------------------------------
@@ -450,14 +450,14 @@ func CalculateGrahaRashis(birthDetailsReq models.BirthChartReq) (models.ChartRes
     )
 
     if err != nil {
-        return models.ChartResult{}, err
+        return dto.ChartResult{}, err
     }
 
     // -------------------------------------------------
     // Final result.
     // -------------------------------------------------
 
-    return models.ChartResult{
+    return dto.ChartResult{
         Ascendant:      ascendant,
         NavAscendant:   navamshaData.Ascendant,
         Rashis:         planetaryData.Rashis,

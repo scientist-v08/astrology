@@ -5,8 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/services"
+	"github.com/scientist-v08/bphs/services/houses"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -18,7 +19,7 @@ type upagrahaConfig struct {
 
 func UpagraHandler(c *gin.Context) {
 	// 1. Bind the request body to the variable and check if the expected values have arrived
-	var req models.UpagrahasNKarakamshasReqBody
+	var req dto.UpagrahasNKarakamshasReqBody
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		// err will be validator.ValidationErrors if validation failed
@@ -67,10 +68,10 @@ func UpagraHandler(c *gin.Context) {
 		{"Pranapada", "pranapada", services.PranapadaEffectsService},
 	}
 
-	var resultsOfUpagrahas []models.UpagrahasNKarakamshasResBody
+	var resultsOfUpagrahas []dto.UpagrahasNKarakamshasResBody
 	for _, cfg := range configs {
 		resultsOfUpagrahas = append(resultsOfUpagrahas,
-			models.UpagrahasNKarakamshasResBody{
+			dto.UpagrahasNKarakamshasResBody{
 				Upagraha: cfg.name,
 				Effects:  cfg.fn(housePlacements[cfg.key]),
 			},
@@ -85,7 +86,7 @@ func UpagraHandler(c *gin.Context) {
 
 func KarakamshaHandler(c *gin.Context) {
 	// 1. Obtain the values from the request body and validate the values
-	var req models.KarakamshaReqBody
+	var req dto.KarakamshaReqBody
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		var errs []string
@@ -127,6 +128,6 @@ func KarakamshaHandler(c *gin.Context) {
 
 	// 3. Return the results
 	c.JSON(http.StatusOK, gin.H{
-		"results": services.KarakamshaEffectsService(&housePlacements, &req),
+		"results": houses.KarakamshaEffectsService(&housePlacements, &req),
 	})
 }

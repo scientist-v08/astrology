@@ -1,39 +1,39 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-type HouseMappings map[models.AllRaashis]int16
-type ReverseHouseMappings map[int16]models.AllRaashis
+type HouseMappings map[dto.AllRaashis]int16
+type ReverseHouseMappings map[int16]dto.AllRaashis
 type NumericalAscendantHousesMap map[string]HouseMappings
 type ReverseNumericalAscendantHousesMap map[string]ReverseHouseMappings
 
 const (
-	Mesha models.AllRaashis =  "Mesha"
-	SuryaUccha models.AllRaashis =  "Mesha"
-	ShaniNeecha models.AllRaashis =  "Mesha"
-	Vrushabha models.AllRaashis =  "Vrushabha"
-	ChandraUccha models.AllRaashis =  "Vrushabha"
-	Mithuna models.AllRaashis =  "Mithuna"
-	Karkataka models.AllRaashis =  "Karkataka"
-	GuruUccha models.AllRaashis =  "Karkataka"
-	KujaNeecha models.AllRaashis =  "Karkataka"
-	Simha models.AllRaashis =  "Simha"
-	Kanya models.AllRaashis =  "Kanya"
-	BudhaUccha models.AllRaashis =  "Kanya"
-	ShukraNeecha models.AllRaashis =  "Kanya"
-	Tula models.AllRaashis =  "Tula"
-	ShaniUccha models.AllRaashis =  "Tula"
-	SuryaNeecha models.AllRaashis =  "Tula"
-	Vruschika models.AllRaashis =  "Vruschika"
-	ChandraNeecha models.AllRaashis =  "Vruschika"
-	Dhanassu models.AllRaashis =  "Dhanassu"
-	Makara models.AllRaashis =  "Makara"
-	KujaUccha models.AllRaashis =  "Makara"
-	GuruNeecha models.AllRaashis =  "Makara"
-	Kumbha models.AllRaashis =	 "Kumbha"
-	Meena models.AllRaashis =  "Meena"
-	BudhaNeecha models.AllRaashis =  "Meena"
-	ShukraUccha models.AllRaashis =  "Meena"
+	Mesha dto.AllRaashis =  "Mesha"
+	SuryaUccha dto.AllRaashis =  "Mesha"
+	ShaniNeecha dto.AllRaashis =  "Mesha"
+	Vrushabha dto.AllRaashis =  "Vrushabha"
+	ChandraUccha dto.AllRaashis =  "Vrushabha"
+	Mithuna dto.AllRaashis =  "Mithuna"
+	Karkataka dto.AllRaashis =  "Karkataka"
+	GuruUccha dto.AllRaashis =  "Karkataka"
+	KujaNeecha dto.AllRaashis =  "Karkataka"
+	Simha dto.AllRaashis =  "Simha"
+	Kanya dto.AllRaashis =  "Kanya"
+	BudhaUccha dto.AllRaashis =  "Kanya"
+	ShukraNeecha dto.AllRaashis =  "Kanya"
+	Tula dto.AllRaashis =  "Tula"
+	ShaniUccha dto.AllRaashis =  "Tula"
+	SuryaNeecha dto.AllRaashis =  "Tula"
+	Vruschika dto.AllRaashis =  "Vruschika"
+	ChandraNeecha dto.AllRaashis =  "Vruschika"
+	Dhanassu dto.AllRaashis =  "Dhanassu"
+	Makara dto.AllRaashis =  "Makara"
+	KujaUccha dto.AllRaashis =  "Makara"
+	GuruNeecha dto.AllRaashis =  "Makara"
+	Kumbha dto.AllRaashis =	 "Kumbha"
+	Meena dto.AllRaashis =  "Meena"
+	BudhaNeecha dto.AllRaashis =  "Meena"
+	ShukraUccha dto.AllRaashis =  "Meena"
 )
 
 var NumericalMappingsStore = NumericalAscendantHousesMap{

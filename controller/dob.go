@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/services/geoapify"
 	"github.com/scientist-v08/bphs/services/shadbala"
 	swissEphemeris "github.com/scientist-v08/bphs/services/swiss-ephemeris"
@@ -16,7 +16,7 @@ import (
 
 func DobForAll(c *gin.Context) {
 	// 1. Obtain the request body from the post request and validate them.
-	var req models.BirthChartReq
+	var req dto.BirthChartReq
 
 	// 2. Validate request body
 	if err := c.ShouldBindJSON(&req); err != nil {

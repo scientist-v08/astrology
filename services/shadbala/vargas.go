@@ -2,7 +2,7 @@ package shadbala
 
 import (
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 const (
@@ -52,7 +52,7 @@ func saptamsaSignOld(lon float64) int {
 // Sign lords
 // ---------------------------------------------------------------------------
 
-var signLord = [12]models.Raashyadhipati{
+var signLord = [12]dto.Raashyadhipati{
 	constants.Kuja, constants.Shukra, constants.Budha, constants.Chandra,
 	constants.Surya, constants.Budha, constants.Shukra, constants.Kuja,
 	constants.Guru, constants.Shani, constants.Shani, constants.Guru,
@@ -92,7 +92,7 @@ type moolaRange struct {
 	start, end float64
 }
 
-var moolatrikona = map[models.Raashyadhipati]moolaRange{
+var moolatrikona = map[dto.Raashyadhipati]moolaRange{
 	constants.Surya:   {4, 0, 20},  // Leo 0-20
 	constants.Chandra: {1, 3, 30},  // Taurus 3-30
 	constants.Kuja:    {0, 0, 12},  // Aries 0-12
@@ -107,7 +107,7 @@ var moolatrikona = map[models.Raashyadhipati]moolaRange{
 // ---------------------------------------------------------------------------
 
 // Natural (naisargika) friends and enemies per BPHS. Anyone not listed is neutral.
-var naturalFriends = map[models.Raashyadhipati][]models.Raashyadhipati{
+var naturalFriends = map[dto.Raashyadhipati][]dto.Raashyadhipati{
 	constants.Surya:   {constants.Chandra, constants.Kuja, constants.Guru},
 	constants.Chandra: {constants.Surya, constants.Budha},
 	constants.Kuja:    {constants.Surya, constants.Chandra, constants.Guru},
@@ -117,7 +117,7 @@ var naturalFriends = map[models.Raashyadhipati][]models.Raashyadhipati{
 	constants.Shani:   {constants.Budha, constants.Shukra},
 }
 
-var naturalEnemies = map[models.Raashyadhipati][]models.Raashyadhipati{
+var naturalEnemies = map[dto.Raashyadhipati][]dto.Raashyadhipati{
 	constants.Surya:   {constants.Shukra, constants.Shani},
 	constants.Chandra: {},
 	constants.Kuja:    {constants.Budha},
@@ -127,7 +127,7 @@ var naturalEnemies = map[models.Raashyadhipati][]models.Raashyadhipati{
 	constants.Shani:   {constants.Surya, constants.Chandra, constants.Kuja},
 }
 
-func contains(list []models.Raashyadhipati, g models.Raashyadhipati) bool {
+func contains(list []dto.Raashyadhipati, g dto.Raashyadhipati) bool {
 	for _, x := range list {
 		if x == g {
 			return true
@@ -137,7 +137,7 @@ func contains(list []models.Raashyadhipati, g models.Raashyadhipati) bool {
 }
 
 // naturalRelation: +1 friend, 0 neutral, -1 enemy.
-func naturalRelation(from, to models.Raashyadhipati) int {
+func naturalRelation(from, to dto.Raashyadhipati) int {
 	switch {
 	case contains(naturalFriends[from], to):
 		return 1
@@ -163,7 +163,7 @@ func temporaryRelation(fromSign, toSign int) int {
 //	friend+friend  -> adhimitra   neutral+friend -> mitra
 //	friend+enemy   -> sama        neutral+enemy  -> shatru
 //	enemy+friend   -> sama        enemy+enemy    -> adhishatru
-func compoundRelation(g, lord models.Raashyadhipati, rasiSign map[models.Raashyadhipati]int) Dignity {
+func compoundRelation(g, lord dto.Raashyadhipati, rasiSign map[dto.Raashyadhipati]int) Dignity {
 	score := naturalRelation(g, lord) + temporaryRelation(rasiSign[g], rasiSign[lord])
 	switch score {
 	case 2:
@@ -181,7 +181,7 @@ func compoundRelation(g, lord models.Raashyadhipati, rasiSign map[models.Raashya
 
 // dignityIn returns the dignity of graha g placed in `sign` of some varga.
 // Moolatrikona is only considered in the Rasi chart (needs the exact degree).
-func dignityIn(g models.Raashyadhipati, sign int, rasiLon float64, isRasi bool, rasiSign map[models.Raashyadhipati]int) Dignity {
+func dignityIn(g dto.Raashyadhipati, sign int, rasiLon float64, isRasi bool, rasiSign map[dto.Raashyadhipati]int) Dignity {
 	if isRasi {
 		if m, ok := moolatrikona[g]; ok && sign == m.sign {
 			d := degreesInSign(rasiLon)
@@ -324,7 +324,7 @@ func trimsamsaSign(lon float64) int {
 // Rasi, Hora, Drekkana, Saptamsa, Navamsa, Dwadasamsa, Trimsamsa.
 // Rasi and Navamsa signs come from the chart context (request body);
 // the rest are derived from the longitude.
-func saptavargajaBala(g models.Raashyadhipati, ctx *chartContext) ([]SaptavargaEntry, float64) {
+func saptavargajaBala(g dto.Raashyadhipati, ctx *chartContext) ([]SaptavargaEntry, float64) {
 	lon := ctx.longitude[g]
 
 	vargas := []struct {

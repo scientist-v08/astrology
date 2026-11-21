@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -35,7 +35,7 @@ func aspectStrength(delta float64) float64 {
 
 func rasiOf(lon float64) int { return int(utils.Normalize360(lon) / 30) }
 
-func isMaleficForDrik(p models.Raashyadhipati, ctx *chartContext) bool {
+func isMaleficForDrik(p dto.Raashyadhipati, ctx *chartContext) bool {
 	switch p {
 	case constants.Surya, constants.Kuja, constants.Shani:
 		return true
@@ -44,7 +44,7 @@ func isMaleficForDrik(p models.Raashyadhipati, ctx *chartContext) bool {
 		return elong < 90 || elong > 270
 	case constants.Budha:
 		r := rasiOf(ctx.longitude[constants.Budha])
-		for _, q := range []models.Raashyadhipati{constants.Surya, constants.Kuja, constants.Shani} {
+		for _, q := range []dto.Raashyadhipati{constants.Surya, constants.Kuja, constants.Shani} {
 			if rasiOf(ctx.longitude[q]) == r {
 				return true
 			}
@@ -55,8 +55,8 @@ func isMaleficForDrik(p models.Raashyadhipati, ctx *chartContext) bool {
 }
 
 func calculateDrikBala(ctx *chartContext) DrikBalaResult {
-	res := DrikBalaResult{Values: make(map[models.Raashyadhipati]float64)}
-	planets := []models.Raashyadhipati{
+	res := DrikBalaResult{Values: make(map[dto.Raashyadhipati]float64)}
+	planets := []dto.Raashyadhipati{
 		constants.Surya, constants.Chandra, constants.Kuja,
 		constants.Budha, constants.Guru, constants.Shukra, constants.Shani,
 	}
@@ -78,5 +78,5 @@ func calculateDrikBala(ctx *chartContext) DrikBalaResult {
 }
 
 type DrikBalaResult struct {
-	Values map[models.Raashyadhipati]float64 `json:"values"` // can be negative
+	Values map[dto.Raashyadhipati]float64 `json:"values"` // can be negative
 }

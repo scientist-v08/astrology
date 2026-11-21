@@ -2,7 +2,7 @@ package shadbala
 
 import (
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/utils"
 )
 
@@ -12,7 +12,7 @@ func digBalaForPlanet(
 	planetLon float64,
 	ascLon float64,
 	mcLon float64,
-	planet models.Raashyadhipati,
+	planet dto.Raashyadhipati,
 ) float64 {
 
 	// Cardinal points using actual Ascendant (1st/7th) and MC (10th/4th)
@@ -49,10 +49,10 @@ func digBalaForPlanet(
 // calculateDigBala returns Dig Bala for all seven planets.
 func calculateDigBala(ctx *chartContext) DigBalaResult {
 	res := DigBalaResult{
-		Values: make(map[models.Raashyadhipati]float64),
+		Values: make(map[dto.Raashyadhipati]float64),
 	}
 
-	planets := []models.Raashyadhipati{
+	planets := []dto.Raashyadhipati{
 		constants.Surya, constants.Chandra, constants.Kuja,
 		constants.Budha, constants.Guru, constants.Shukra, constants.Shani,
 	}
@@ -66,5 +66,5 @@ func calculateDigBala(ctx *chartContext) DigBalaResult {
 }
 
 type DigBalaResult struct {
-	Values map[models.Raashyadhipati]float64 `json:"values"` // Virupas
+	Values map[dto.Raashyadhipati]float64 `json:"values"` // Virupas
 }

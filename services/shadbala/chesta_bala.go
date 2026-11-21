@@ -6,12 +6,12 @@ import (
 
 	"github.com/mshafiee/swephgo"
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/utils"
 )
 
 type ChestaBalaResult struct {
-	Values map[models.Raashyadhipati]float64 `json:"values"`
+	Values map[dto.Raashyadhipati]float64 `json:"values"`
 }
 
 type ChestaElements struct {
@@ -24,7 +24,7 @@ func calculateChestaBala(
 	ctx *chartContext,
 	kaala KaalaBalaResult,
 ) ChestaBalaResult {
-	res := make(map[models.Raashyadhipati]float64, 7)
+	res := make(map[dto.Raashyadhipati]float64, 7)
 
 	// Sun's Ayana Bala and Moon's Paksha Bala are already doubled (0–120)
 	// in Kaala Bala, so their Chesta Bala is 0 to avoid double-counting.
@@ -34,7 +34,7 @@ func calculateChestaBala(
 	elements, err := computeChestaElements(ctx)
 	if err != nil {
 		fmt.Printf("Chesta Bala calculation failed: %v\n", err)
-		for _, g := range []models.Raashyadhipati{
+		for _, g := range []dto.Raashyadhipati{
 			constants.Kuja,
 			constants.Budha,
 			constants.Guru,
@@ -70,7 +70,7 @@ func chestaBala(seeghrochcha, meanLon, trueLon float64) float64 {
 
 func computeChestaElements(
 	ctx *chartContext,
-) (map[models.Raashyadhipati]ChestaElements, error) {
+) (map[dto.Raashyadhipati]ChestaElements, error) {
 	jd := ctx.birthDateTime
 	ayanamsha := swephgo.GetAyanamsaUt(jd)
 
@@ -110,7 +110,7 @@ func computeChestaElements(
 	meanVen = toSidereal(meanVen)
 	meanSat = toSidereal(meanSat)
 
-	return map[models.Raashyadhipati]ChestaElements{
+	return map[dto.Raashyadhipati]ChestaElements{
 		// Outer planets: own mean longitude, Sun as Seeghrochcha
 		constants.Kuja: {
 			MeanLongitude: meanMars,

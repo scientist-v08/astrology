@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-var OppositeAspectsStore = map[models.AllRaashis]models.AllRaashis{
+var OppositeAspectsStore = map[dto.AllRaashis]dto.AllRaashis{
     Mesha:     Tula,
     Vrushabha: Vruschika,
     Mithuna:   Dhanassu,

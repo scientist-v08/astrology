@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/initializers"
-	"github.com/scientist-v08/bphs/models"
 )
 
 func SearchPlaces(
 	ctx context.Context,
 	query string,
-) (*models.GeoapifyResponse, error) {
+) (*dto.GeoapifyResponse, error) {
 
 	if strings.TrimSpace(query) == "" {
 		return nil, fmt.Errorf("search query cannot be empty")
@@ -66,7 +66,7 @@ func SearchPlaces(
 		)
 	}
 
-	var result models.GeoapifyResponse
+	var result dto.GeoapifyResponse
 
 	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("failed to decode Geoapify response: %w", err)

@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-var DebilitationMapStore = models.SpecialPosition{
+var DebilitationMapStore = dto.SpecialPosition{
 	Shani: Mesha,
 	Kuja: Karkataka,    
 	Shukra: Kanya,  
@@ -12,7 +12,7 @@ var DebilitationMapStore = models.SpecialPosition{
 	Guru: Makara,    
 }
 
-var ReverseDebilitationMapStore = models.ReverseSpecialPosition{
+var ReverseDebilitationMapStore = dto.ReverseSpecialPosition{
 	Mesha: Shani,
 	Karkataka: Kuja,    
 	Kanya: Shukra,  

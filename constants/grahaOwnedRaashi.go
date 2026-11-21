@@ -1,13 +1,13 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-var GrahaOwnedRaashiMapStore = models.ReverseRaashyadhipatiMapping{
-	Kuja:    []models.AllRaashis{Mesha, Vruschika},
-	Shukra:  []models.AllRaashis{Vrushabha, Tula},
-	Budha:   []models.AllRaashis{Mithuna, Kanya},
-	Chandra: []models.AllRaashis{Karkataka},
-	Surya:   []models.AllRaashis{Simha},
-	Guru:    []models.AllRaashis{Dhanassu, Meena},
-	Shani:   []models.AllRaashis{Makara, Kumbha},
+var GrahaOwnedRaashiMapStore = dto.ReverseRaashyadhipatiMapping{
+	Kuja:    []dto.AllRaashis{Mesha, Vruschika},
+	Shukra:  []dto.AllRaashis{Vrushabha, Tula},
+	Budha:   []dto.AllRaashis{Mithuna, Kanya},
+	Chandra: []dto.AllRaashis{Karkataka},
+	Surya:   []dto.AllRaashis{Simha},
+	Guru:    []dto.AllRaashis{Dhanassu, Meena},
+	Shani:   []dto.AllRaashis{Makara, Kumbha},
 }

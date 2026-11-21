@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-var ShaniAspectsStore = models.SpecialAspectsMap{
+var ShaniAspectsStore = dto.SpecialAspectsMap{
 		Mesha: {
 			{House: Tula}, // 7th
 			{House: Mithuna}, // 3rd
