@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 func IsKendra(h int16) bool {
@@ -32,39 +32,39 @@ func IsDusthana(h int16) bool {
 	}
 }
 
-func GetGuruAspectRaashis(lagna models.AllRaashis) []models.AllRaashis {
+func GetGuruAspectRaashis(lagna dto.AllRaashis) []dto.AllRaashis {
 	aspects, exists := constants.BrihaspatiAspectsStore[lagna]
 	if !exists {
 		return nil // or []AllRaashis{} depending on your preference
 	}
 
-	result := make([]models.AllRaashis, 0, len(aspects))
+	result := make([]dto.AllRaashis, 0, len(aspects))
 	for _, item := range aspects {
 		result = append(result, item.House)
 	}
 	return result
 }
 
-func GetShaniAspectRaashis(lagna models.AllRaashis) []models.AllRaashis {
+func GetShaniAspectRaashis(lagna dto.AllRaashis) []dto.AllRaashis {
 	aspects, exists := constants.ShaniAspectsStore[lagna]
 	if !exists {
 		return nil // or []AllRaashis{} depending on your preference
 	}
 
-	result := make([]models.AllRaashis, 0, len(aspects))
+	result := make([]dto.AllRaashis, 0, len(aspects))
 	for _, item := range aspects {
 		result = append(result, item.House)
 	}
 	return result
 }
 
-func GetKujaAspectRaashis(lagna models.AllRaashis) []models.AllRaashis {
+func GetKujaAspectRaashis(lagna dto.AllRaashis) []dto.AllRaashis {
 	aspects, exists := constants.KujaAspectsStore[lagna]
 	if !exists {
 		return nil // or []AllRaashis{} depending on your preference
 	}
 
-	result := make([]models.AllRaashis, 0, len(aspects))
+	result := make([]dto.AllRaashis, 0, len(aspects))
 	for _, item := range aspects {
 		result = append(result, item.House)
 	}
@@ -72,17 +72,17 @@ func GetKujaAspectRaashis(lagna models.AllRaashis) []models.AllRaashis {
 }
 
 func GetHouse(ascendant string, raashiPlacement string) int16 {
-	house, _ := constants.NumericalMappingsStore[ascendant][models.AllRaashis(raashiPlacement)]
+	house, _ := constants.NumericalMappingsStore[ascendant][dto.AllRaashis(raashiPlacement)]
 	return house
 }
 
-func GetHouseName(ascendant string, raashiPlacement int16) models.AllRaashis {
+func GetHouseName(ascendant string, raashiPlacement int16) dto.AllRaashis {
 	house, _ := constants.ReverseNumericalMappingsStore[ascendant][raashiPlacement]
 	return house
 }
 
 func IsGrahaCombust(
-	graha models.Raashyadhipati,
+	graha dto.Raashyadhipati,
 	kujaCombust bool,
 	shukraCombust bool,
 	budhCombust bool,
@@ -107,7 +107,7 @@ func IsGrahaCombust(
 	return false
 }
 
-func IsLordInOwnHouse(lord models.Raashyadhipati, houseName models.AllRaashis) bool {
+func IsLordInOwnHouse(lord dto.Raashyadhipati, houseName dto.AllRaashis) bool {
     switch lord {
     case constants.Kuja:
         return houseName == constants.Mesha || houseName == constants.Vruschika
@@ -135,7 +135,7 @@ func IsLordInOwnHouse(lord models.Raashyadhipati, houseName models.AllRaashis) b
     }
 }
 
-func IsLordCombust(lord models.Raashyadhipati, reqBody *models.HouseEffectsReqBody) bool {
+func IsLordCombust(lord dto.Raashyadhipati, reqBody *dto.HouseEffectsReqBody) bool {
 	switch lord {
     case constants.Kuja:
         return (*reqBody).KujaPlacement.Combustion

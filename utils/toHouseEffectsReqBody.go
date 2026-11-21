@@ -1,19 +1,19 @@
 package utils
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-func ToHouseEffectsReqBody(chart models.ChartResult) models.HouseEffectsReqBody {
-	return models.HouseEffectsReqBody{
+func ToHouseEffectsReqBody(chart dto.ChartResult) dto.HouseEffectsReqBody {
+	return dto.HouseEffectsReqBody{
 		Ascendant: chart.Ascendant,
 
 		SuryaPlacement: string(chart.Rashis["Surya"]),
 
-		BudhaPlacement: models.GrahaFullDetails{
+		BudhaPlacement: dto.GrahaFullDetails{
 			Placement:  chart.Rashis["Budha"],
 			Combustion: chart.Combustion["Budha"],
 		},
 
-		ShukraPlacement: models.GrahaFullDetails{
+		ShukraPlacement: dto.GrahaFullDetails{
 			Placement:  chart.Rashis["Shukra"],
 			Combustion: chart.Combustion["Shukra"],
 		},
@@ -24,17 +24,17 @@ func ToHouseEffectsReqBody(chart models.ChartResult) models.HouseEffectsReqBody 
 		RahuPlacement: chart.Rashis["Rahu"],
 		KetuPlacement: chart.Rashis["Ketu"],
 
-		KujaPlacement: models.GrahaFullDetails{
+		KujaPlacement: dto.GrahaFullDetails{
 			Placement:  chart.Rashis["Kuja"],
 			Combustion: chart.Combustion["Kuja"],
 		},
 
-		GuruPlacement: models.GrahaFullDetails{
+		GuruPlacement: dto.GrahaFullDetails{
 			Placement:  chart.Rashis["Guru"],
 			Combustion: chart.Combustion["Guru"],
 		},
 
-		ShaniPlacement: models.GrahaFullDetails{
+		ShaniPlacement: dto.GrahaFullDetails{
 			Placement:  chart.Rashis["Shani"],
 			Combustion: chart.Combustion["Shani"],
 		},

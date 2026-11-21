@@ -5,13 +5,14 @@ import (
 	"math"
 
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
+	"github.com/scientist-v08/bphs/services/couple"
 	"github.com/scientist-v08/bphs/utils"
 )
 
 // CalculateNavamshaLagna computes the Navamsha (D9) Lagna raashi
 // from the Rasi Ascendant and its degree within the sign.
-func CalculateNavamshaLagna(req *models.ConditionalDasaReq) (string, error) {
+func CalculateNavamshaLagna(req *dto.ConditionalDasaReq) (string, error) {
 	asc := req.Ascendant
 	deg := float64(req.AscendantDeg.Deg) + (float64(req.AscendantDeg.Min) / 60)
 
@@ -54,7 +55,7 @@ func CalculateNavamshaLagna(req *models.ConditionalDasaReq) (string, error) {
 
 // CalculateHoraLagna computes the Hora (D2) Lagna.
 // Result is always either "Simha" (Solar Hora) or "Karkataka" (Lunar Hora).
-func CalculateHoraLagna(req *models.ConditionalDasaReq) (string, error) {
+func CalculateHoraLagna(req *dto.ConditionalDasaReq) (string, error) {
 	asc := req.Ascendant
 	deg := float64(req.AscendantDeg.Deg) + (float64(req.AscendantDeg.Min) / 60)
 
@@ -85,7 +86,7 @@ func CalculateHoraLagna(req *models.ConditionalDasaReq) (string, error) {
 
 // CalculateDwadasamsaLagna computes the Dwadasamsa (D12) Lagna raashi.
 // Each portion = 2°30'. Counting always starts from the Rasi lagna itself and proceeds forward.
-func CalculateDwadasamsaLagna(req *models.ConditionalDasaReq) (string, error) {
+func CalculateDwadasamsaLagna(req *dto.ConditionalDasaReq) (string, error) {
 	asc := req.Ascendant
 	deg := float64(req.AscendantDeg.Deg) + (float64(req.AscendantDeg.Min) / 60)
 
@@ -105,12 +106,12 @@ func CalculateDwadasamsaLagna(req *models.ConditionalDasaReq) (string, error) {
 
 	// Start from the same sign and move (portionNum-1) signs forward.
 	// Using Mod for safety (handles any future reverse-counting needs).
-	finalIdx := int(Mod(int8(idx+(portionNum-1)), 12))
+	finalIdx := int(couple.Mod(int8(idx+(portionNum-1)), 12))
 
 	return constants.RaashiOrder[finalIdx], nil
 }
 
-func GetLordHouse(req *models.ConditionalDasaReq, ascLord models.Raashyadhipati) string {
+func GetLordHouse(req *dto.ConditionalDasaReq, ascLord dto.Raashyadhipati) string {
 	switch ascLord {
 		case    constants.Kuja:
 			return req.KujaPlacement
@@ -130,7 +131,7 @@ func GetLordHouse(req *models.ConditionalDasaReq, ascLord models.Raashyadhipati)
 	return ""
 }
 
-func CalculateApplicableConditionalDasa(req models.ConditionalDasaReq) []string {
+func CalculateApplicableConditionalDasa(req dto.ConditionalDasaReq) []string {
 	var applicableDasa []string
 	// Collect required information for Chandra house placements
 	chandraHousePlacements := map[string]int16{

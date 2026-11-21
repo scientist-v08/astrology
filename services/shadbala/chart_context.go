@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 	"github.com/scientist-v08/bphs/utils"
 )
 
-var shadbalaGrahas = []models.Raashyadhipati{
+var shadbalaGrahas = []dto.Raashyadhipati{
 	constants.Surya, constants.Chandra, constants.Kuja, constants.Budha,
 	constants.Guru, constants.Shukra, constants.Shani,
 }
@@ -18,15 +18,15 @@ var shadbalaGrahas = []models.Raashyadhipati{
 // chartContext is the single, validated view of the chart that every bala
 // reads from. Sign indices follow constants.RaashiOrder (0 = Aries).
 type chartContext struct {
-	longitude         map[models.Raashyadhipati]float64 // sidereal, 0..360
-	rasiSign          map[models.Raashyadhipati]int     // D1 sign index
-	navamsaSign       map[models.Raashyadhipati]int     // D9 sign index
+	longitude         map[dto.Raashyadhipati]float64 // sidereal, 0..360
+	rasiSign          map[dto.Raashyadhipati]int     // D1 sign index
+	navamsaSign       map[dto.Raashyadhipati]int     // D9 sign index
 	ascSign           int
 	ascendantLong     float64
 	chandraWaxing     bool
-	speeds            map[models.Raashyadhipati]float64
-	declinations      map[models.Raashyadhipati]float64 // tropical
-	eclipticLatitudes map[models.Raashyadhipati]float64
+	speeds            map[dto.Raashyadhipati]float64
+	declinations      map[dto.Raashyadhipati]float64 // tropical
+	eclipticLatitudes map[dto.Raashyadhipati]float64
 	sunriseJD         float64
 	sunsetJD          float64
 	isDayBirth        bool
@@ -38,8 +38,8 @@ type chartContext struct {
 	solarMonthStartJD float64
 }
 
-func d1Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string {
-	return map[models.Raashyadhipati]string{
+func d1Placements(b dto.HouseEffectsReqBody) map[dto.Raashyadhipati]string {
+	return map[dto.Raashyadhipati]string{
 		constants.Surya:   b.SuryaPlacement,
 		constants.Chandra: b.ChandraPlacement,
 		constants.Kuja:    b.KujaPlacement.Placement,
@@ -50,8 +50,8 @@ func d1Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string
 	}
 }
 
-func d9Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string {
-	return map[models.Raashyadhipati]string{
+func d9Placements(b dto.HouseEffectsReqBody) map[dto.Raashyadhipati]string {
+	return map[dto.Raashyadhipati]string{
 		constants.Surya:   b.NavSuryaPlacement,
 		constants.Chandra: b.NavChandraPlacement,
 		constants.Kuja:    b.NavKujaPlacement,
@@ -64,12 +64,12 @@ func d9Placements(b models.HouseEffectsReqBody) map[models.Raashyadhipati]string
 
 func newChartContext(in Input) (*chartContext, error) {
 	c := &chartContext{
-		longitude:         make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		rasiSign:          make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
-		navamsaSign:       make(map[models.Raashyadhipati]int, len(shadbalaGrahas)),
-		speeds:            make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		declinations:      make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
-		eclipticLatitudes: make(map[models.Raashyadhipati]float64, len(shadbalaGrahas)),
+		longitude:         make(map[dto.Raashyadhipati]float64, len(shadbalaGrahas)),
+		rasiSign:          make(map[dto.Raashyadhipati]int, len(shadbalaGrahas)),
+		navamsaSign:       make(map[dto.Raashyadhipati]int, len(shadbalaGrahas)),
+		speeds:            make(map[dto.Raashyadhipati]float64, len(shadbalaGrahas)),
+		declinations:      make(map[dto.Raashyadhipati]float64, len(shadbalaGrahas)),
+		eclipticLatitudes: make(map[dto.Raashyadhipati]float64, len(shadbalaGrahas)),
 	}
 
 	d1 := d1Placements(in.Chart)
@@ -178,11 +178,11 @@ func angularSeparation(a, b float64) float64 { return angularDistance(a, b) }
 
 func isOddSign(sign int) bool { return sign%2 == 0 }
 
-func isDayPlanet(g models.Raashyadhipati) bool {
+func isDayPlanet(g dto.Raashyadhipati) bool {
 	return g == constants.Surya || g == constants.Guru || g == constants.Shukra
 }
 
-func isNightPlanet(g models.Raashyadhipati) bool {
+func isNightPlanet(g dto.Raashyadhipati) bool {
 	return g == constants.Chandra || g == constants.Kuja || g == constants.Shani
 }
 

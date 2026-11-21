@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-var ExaltationMapStore = models.SpecialPosition{
+var ExaltationMapStore = dto.SpecialPosition{
 	Shani: Tula,
 	Kuja: Makara,    
 	Shukra: Meena,  
@@ -12,7 +12,7 @@ var ExaltationMapStore = models.SpecialPosition{
 	Guru: Karkataka,
 }
 
-var ReverseExaltationMapStore = models.ReverseSpecialPosition{
+var ReverseExaltationMapStore = dto.ReverseSpecialPosition{
 	Tula: Shani,
 	Makara: Kuja,    
 	Meena: Shukra,  

@@ -1,38 +1,38 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
 const (
-    Ashwini     models.Nakshatra = "Ashwini"
-    Bharani     models.Nakshatra = "Bharani"
-    Krittika    models.Nakshatra = "Krittika"
-    Rohini      models.Nakshatra = "Rohini"
-    Mrigashira  models.Nakshatra = "Mrigashira"
-    Ardra       models.Nakshatra = "Ardra"
-    Punarvasu   models.Nakshatra = "Punarvasu"
-    Pushya      models.Nakshatra = "Pushya"
-    Ashlesha    models.Nakshatra = "Ashlesha"
-    Magha       models.Nakshatra = "Magha"
-    PurvaPhalguni  models.Nakshatra = "Purva Phalguni"
-    UttaraPhalguni models.Nakshatra = "Uttara Phalguni"
-    Hasta       models.Nakshatra = "Hasta"
-    Chitra      models.Nakshatra = "Chitra"
-    Swati       models.Nakshatra = "Swati"
-    Vishakha    models.Nakshatra = "Vishakha"
-    Anuradha    models.Nakshatra = "Anuradha"
-    Jyeshtha    models.Nakshatra = "Jyeshtha"
-    Mula        models.Nakshatra = "Mula"
-    PurvaAshadha   models.Nakshatra = "Purva Ashadha"
-    UttaraAshadha  models.Nakshatra = "Uttara Ashadha"
-    Shravana    models.Nakshatra = "Shravana"
-    Dhanishta   models.Nakshatra = "Dhanishta"
-    Shatabhisha models.Nakshatra = "Shatabhisha"
-    PurvaBhadrapada models.Nakshatra = "Purva Bhadrapada"
-    UttaraBhadrapada models.Nakshatra = "Uttara Bhadrapada"
-    Revati      models.Nakshatra = "Revati"
+    Ashwini     dto.Nakshatra = "Ashwini"
+    Bharani     dto.Nakshatra = "Bharani"
+    Krittika    dto.Nakshatra = "Krittika"
+    Rohini      dto.Nakshatra = "Rohini"
+    Mrigashira  dto.Nakshatra = "Mrigashira"
+    Ardra       dto.Nakshatra = "Ardra"
+    Punarvasu   dto.Nakshatra = "Punarvasu"
+    Pushya      dto.Nakshatra = "Pushya"
+    Ashlesha    dto.Nakshatra = "Ashlesha"
+    Magha       dto.Nakshatra = "Magha"
+    PurvaPhalguni  dto.Nakshatra = "Purva Phalguni"
+    UttaraPhalguni dto.Nakshatra = "Uttara Phalguni"
+    Hasta       dto.Nakshatra = "Hasta"
+    Chitra      dto.Nakshatra = "Chitra"
+    Swati       dto.Nakshatra = "Swati"
+    Vishakha    dto.Nakshatra = "Vishakha"
+    Anuradha    dto.Nakshatra = "Anuradha"
+    Jyeshtha    dto.Nakshatra = "Jyeshtha"
+    Mula        dto.Nakshatra = "Mula"
+    PurvaAshadha   dto.Nakshatra = "Purva Ashadha"
+    UttaraAshadha  dto.Nakshatra = "Uttara Ashadha"
+    Shravana    dto.Nakshatra = "Shravana"
+    Dhanishta   dto.Nakshatra = "Dhanishta"
+    Shatabhisha dto.Nakshatra = "Shatabhisha"
+    PurvaBhadrapada dto.Nakshatra = "Purva Bhadrapada"
+    UttaraBhadrapada dto.Nakshatra = "Uttara Bhadrapada"
+    Revati      dto.Nakshatra = "Revati"
 )
 
-var NakshatraNumberMap = map[models.Nakshatra]int8{
+var NakshatraNumberMap = map[dto.Nakshatra]int8{
     Ashwini:          1,
     Bharani:          2,
     Krittika:         3,
@@ -62,7 +62,7 @@ var NakshatraNumberMap = map[models.Nakshatra]int8{
     Revati:          27,
 }
 
-var NakshatraYoniMap = map[models.Nakshatra]string{
+var NakshatraYoniMap = map[dto.Nakshatra]string{
     Ashwini:              "Horse",
     Bharani:              "Elephant",
     Krittika:             "Sheep",
@@ -92,7 +92,7 @@ var NakshatraYoniMap = map[models.Nakshatra]string{
     Revati:               "Elephant",
 }
 
-var NakshatraGanaMap = map[models.Nakshatra]int8{
+var NakshatraGanaMap = map[dto.Nakshatra]int8{
     Ashwini:              1, // Deva
     Bharani:              2, // Manushya
     Krittika:             3, // Rakshasa
@@ -122,7 +122,7 @@ var NakshatraGanaMap = map[models.Nakshatra]int8{
     Revati:               1,
 }
 
-var NakshatraNadiMap = map[models.Nakshatra]int8{
+var NakshatraNadiMap = map[dto.Nakshatra]int8{
     Ashwini:              1, // Adi
     Bharani:              2, // Madhya
     Krittika:             3, // Antya
@@ -152,7 +152,7 @@ var NakshatraNadiMap = map[models.Nakshatra]int8{
     Revati:               3,
 }
 
-var NakshatraRajjuMap = map[models.Nakshatra]string{
+var NakshatraRajjuMap = map[dto.Nakshatra]string{
     Ashwini:              "Paada",
     Bharani:              "Ooru",
     Krittika:             "Nabhi",

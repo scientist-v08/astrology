@@ -5,14 +5,14 @@ import (
 	"math"
 
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 func CalculateAtmakaraka(
-	longitudes map[models.Raashyadhipati]float64,
-) (models.AtmakarakaResult, error) {
+	longitudes map[dto.Raashyadhipati]float64,
+) (dto.AtmakarakaResult, error) {
 
-	karakaGrahas := []models.Raashyadhipati{
+	karakaGrahas := []dto.Raashyadhipati{
         constants.Surya,
         constants.Chandra,
         constants.Kuja,
@@ -23,7 +23,7 @@ func CalculateAtmakaraka(
         constants.Rahu,
     }
 
-    var result models.AtmakarakaResult
+    var result dto.AtmakarakaResult
     highestDegree := -1.0
 
     for _, graha := range karakaGrahas {
@@ -31,7 +31,7 @@ func CalculateAtmakaraka(
         longitude, exists := longitudes[graha]
 
         if !exists {
-            return models.AtmakarakaResult{}, fmt.Errorf(
+            return dto.AtmakarakaResult{}, fmt.Errorf(
                 "missing longitude for graha: %v",
                 graha,
             )
@@ -60,7 +60,7 @@ func CalculateAtmakaraka(
     )
 
     if err != nil {
-        return models.AtmakarakaResult{}, err
+        return dto.AtmakarakaResult{}, err
     }
 
     result.Karakamsha = karakamsha

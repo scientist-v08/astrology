@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/gin-gonic/gin"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 type RankedItem struct {
@@ -14,7 +14,7 @@ type RankedItem struct {
 }
 
 func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
-	var req models.SthanaBalaReq
+	var req dto.SthanaBalaReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -31,7 +31,7 @@ func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
 	}
 
 	grahas := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
-	allGrahaDefined := make([]models.SthanaBalaResField, 7)
+	allGrahaDefined := make([]dto.SthanaBalaResField, 7)
 
 	sum := make([]float32, 7)
 	for i := range req.DrigbalaOfGrahas {
@@ -52,7 +52,7 @@ func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
 	}
 
 	for i := range grahas {
-		allGrahaDefined[i] = models.SthanaBalaResField{
+		allGrahaDefined[i] = dto.SthanaBalaResField{
 			Graha:        grahas[i],
 			EffectiveBala: effectiveSthanaBala[i],
 			Rank:         0,
@@ -84,7 +84,7 @@ func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
 }
 
 func AyanaBalaRanks(c *gin.Context) {
-	var req models.AyanaBalaReq
+	var req dto.AyanaBalaReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -101,7 +101,7 @@ func AyanaBalaRanks(c *gin.Context) {
 	}
 
 	grahas := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
-	allGrahaDefined := make([]models.AyanaBalaResField, 7)
+	allGrahaDefined := make([]dto.AyanaBalaResField, 7)
 	effectiveAyanaBala := make([]float32, 7)
 	AyanaBalaMinimums := []float32{30, 40, 20, 30, 30, 40, 20}
 
@@ -110,7 +110,7 @@ func AyanaBalaRanks(c *gin.Context) {
 	}
 
 	for i := range 7 {
-		allGrahaDefined[i] = models.AyanaBalaResField{
+		allGrahaDefined[i] = dto.AyanaBalaResField{
 			Graha:        grahas[i],
 			AyanaBala: effectiveAyanaBala[i],
 			Rank:         0,
@@ -142,7 +142,7 @@ func AyanaBalaRanks(c *gin.Context) {
 }
 
 func DigBalaOrChestaBalaCalculator(c *gin.Context) {
-	var req models.DigBalaReq
+	var req dto.DigBalaReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -159,7 +159,7 @@ func DigBalaOrChestaBalaCalculator(c *gin.Context) {
 	}
 
 	grahas := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
-	allGrahaDefined := make([]models.DigOrChestaBalaResField, 7)
+	allGrahaDefined := make([]dto.DigOrChestaBalaResField, 7)
 
 	sum := make([]float32, 7)
 	for i := range 7 {
@@ -180,7 +180,7 @@ func DigBalaOrChestaBalaCalculator(c *gin.Context) {
 	}
 
 	for i := range grahas {
-		allGrahaDefined[i] = models.DigOrChestaBalaResField{
+		allGrahaDefined[i] = dto.DigOrChestaBalaResField{
 			Graha:        grahas[i],
 			EffectiveDigOrChestaBala: effectiveSthanaBala[i],
 			Rank:         0,
@@ -212,7 +212,7 @@ func DigBalaOrChestaBalaCalculator(c *gin.Context) {
 }
 
 func IsSthanaGreaterOrKaala(c *gin.Context) {
-	var req models.IsSthansOrKaalaGreater
+	var req dto.IsSthansOrKaalaGreater
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -258,7 +258,7 @@ func IsSthanaGreaterOrKaala(c *gin.Context) {
 }
 
 func PureShadbalaRank(c *gin.Context) {
-	var req models.PureShadbalaReq
+	var req dto.PureShadbalaReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -276,7 +276,7 @@ func PureShadbalaRank(c *gin.Context) {
 
 	grahas := []string{"Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"}
 	naisargikaBala := []float32{60.0,51.4,17.1,25.7,34.3,42.9,8.6}
-	allGrahaDefined := make([]models.ShadBalaResField, 7)
+	allGrahaDefined := make([]dto.ShadBalaResField, 7)
 
 	sum := make([]float32, 7)
 	effectiveShadbala := make([]float32, 7)
@@ -289,7 +289,7 @@ func PureShadbalaRank(c *gin.Context) {
 	}
 
 	for i := range 7 {
-		allGrahaDefined[i] = models.ShadBalaResField{
+		allGrahaDefined[i] = dto.ShadBalaResField{
 			Graha:        grahas[i],
 			EffectiveBala: effectiveShadbala[i],
 			Rank:         0,

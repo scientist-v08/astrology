@@ -1,20 +1,20 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
 const (
-	Kuja    models.Raashyadhipati = "Kuja"
-	Shukra  models.Raashyadhipati = "Shukra"
-	Budha   models.Raashyadhipati = "Budha"
-	Chandra models.Raashyadhipati = "Chandra"
-	Surya   models.Raashyadhipati = "Surya"
-	Guru    models.Raashyadhipati = "Guru"
-	Shani   models.Raashyadhipati = "Shani"
-	Rahu 	models.Raashyadhipati = "Rahu"
-	Ketu 	models.Raashyadhipati = "Ketu"
+	Kuja    dto.Raashyadhipati = "Kuja"
+	Shukra  dto.Raashyadhipati = "Shukra"
+	Budha   dto.Raashyadhipati = "Budha"
+	Chandra dto.Raashyadhipati = "Chandra"
+	Surya   dto.Raashyadhipati = "Surya"
+	Guru    dto.Raashyadhipati = "Guru"
+	Shani   dto.Raashyadhipati = "Shani"
+	Rahu 	dto.Raashyadhipati = "Rahu"
+	Ketu 	dto.Raashyadhipati = "Ketu"
 )
 
-var RaashyadhipatiMapStore = models.RaashyadhipatiMapping{
+var RaashyadhipatiMapStore = dto.RaashyadhipatiMapping{
 	"Mesha":     Kuja,
 	"Vrushabha": Shukra,
 	"Mithuna":   Budha,
@@ -29,7 +29,7 @@ var RaashyadhipatiMapStore = models.RaashyadhipatiMapping{
 	"Meena":     Guru,
 }
 
-var MaitriKuta = map[models.Raashyadhipati]map[models.Raashyadhipati]int8{
+var MaitriKuta = map[dto.Raashyadhipati]map[dto.Raashyadhipati]int8{
 	Kuja: {
 		Kuja:    5,
 		Shukra:  3,

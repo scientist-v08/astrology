@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
 // ---------------------------------------------------------------------------
@@ -16,10 +16,10 @@ type Input struct {
 	// Planets is the value already returned by calculatePlanetaryLongitudes
 	// (sidereal longitudes, 0..360). Must also carry Speeds, Declinations
 	// and EclipticLatitudes when available.
-	Planets models.PlanetaryData
+	Planets dto.PlanetaryData
 
 	// Chart carries the already-computed D1/D9 placements and the ascendant.
-	Chart models.HouseEffectsReqBody
+	Chart dto.HouseEffectsReqBody
 
 	// For Dig / Drik / Kaala
 	AscendantLong     float64
@@ -35,7 +35,7 @@ type Input struct {
 
 	// Optional: pre-computed Chesta elements (mean / true / seeghrochcha).
 	// If nil, Chesta Bala for the five tara grahas will be zero.
-	ChestaElements map[models.Raashyadhipati]ChestaElements
+	ChestaElements map[dto.Raashyadhipati]ChestaElements
 }
 
 // Result is what the controller receives. New balas get added as fields.

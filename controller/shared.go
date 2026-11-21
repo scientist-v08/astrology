@@ -4,18 +4,18 @@ import (
 	"slices"
 
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
-	"github.com/scientist-v08/bphs/services"
+	"github.com/scientist-v08/bphs/dto"
+	"github.com/scientist-v08/bphs/services/houses"
 	"github.com/scientist-v08/bphs/utils"
 )
 
 type HouseEffectsResponse struct {
-	AllHouseEffects    []models.HouseEffectsWithCommentory `json:"allHouseEffects"`
+	AllHouseEffects    []dto.HouseEffectsWithCommentory `json:"allHouseEffects"`
 	ZeroProportion     int8                                `json:"zeroProportion"`
 	Proportions        []float64                           `json:"proportions"`
 	GeneralEffects     []string                            `json:"generalEffects"`
 	KarakamshaResults  []IndexedString                     `json:"karakamshaResults"`
-	Horoscope          *models.HouseEffectsReqBody         `json:"horoscope"`
+	Horoscope          *dto.HouseEffectsReqBody         `json:"horoscope"`
 }
 
 func isGrahaAfflicted(
@@ -26,8 +26,8 @@ func isGrahaAfflicted(
     chandra string,
     chandraWaxing bool,
     isCombust bool,
-    shaniAspects *[]models.AllRaashis,
-    kujaAspects *[]models.AllRaashis,
+    shaniAspects *[]dto.AllRaashis,
+    kujaAspects *[]dto.AllRaashis,
 ) bool {
 
     // Conjunctions
@@ -40,12 +40,12 @@ func isGrahaAfflicted(
     isConjunctWaningMoon := budha == chandra && !chandraWaxing
 
     // Malefic aspects
-    isAspectedByShani := slices.Contains(*shaniAspects,models.AllRaashis(budha))
+    isAspectedByShani := slices.Contains(*shaniAspects,dto.AllRaashis(budha))
 
-    isAspectedByKuja := slices.Contains(*kujaAspects,models.AllRaashis(budha))
+    isAspectedByKuja := slices.Contains(*kujaAspects,dto.AllRaashis(budha))
 
     // Opposition by a waning Moon
-    isOpposedByWaningMoon := !chandraWaxing && constants.OppositeAspectsStore[models.AllRaashis(chandra)] == models.AllRaashis(budha)
+    isOpposedByWaningMoon := !chandraWaxing && constants.OppositeAspectsStore[dto.AllRaashis(chandra)] == dto.AllRaashis(budha)
 
     return isConjunctSurya ||
         isConjunctShani ||
@@ -58,9 +58,9 @@ func isGrahaAfflicted(
 }
 
 func isBudhaAfflicted(
-    req *models.HouseEffectsReqBody,
-    shaniAspects *[]models.AllRaashis,
-    kujaAspects *[]models.AllRaashis,
+    req *dto.HouseEffectsReqBody,
+    shaniAspects *[]dto.AllRaashis,
+    kujaAspects *[]dto.AllRaashis,
 ) bool {
 
     return isGrahaAfflicted(
@@ -77,9 +77,9 @@ func isBudhaAfflicted(
 }
 
 func isNavBudhaAfflicted(
-    req *models.HouseEffectsReqBody,
-    navShaniAspects *[]models.AllRaashis,
-    navKujaAspects *[]models.AllRaashis,
+    req *dto.HouseEffectsReqBody,
+    navShaniAspects *[]dto.AllRaashis,
+    navKujaAspects *[]dto.AllRaashis,
 ) bool {
 
     return isGrahaAfflicted(
@@ -95,7 +95,7 @@ func isNavBudhaAfflicted(
     )
 }
 
-func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse {
+func calculateHouseEffects(req *dto.HouseEffectsReqBody) HouseEffectsResponse {
 	// 1. Compute the different house numbers with respect to the ascendant and the navamsha ascedant and karakamsha.
 	housePlacements := map[string]int16{
 		"Surya": utils.GetHouse(req.Ascendant, req.SuryaPlacement),
@@ -131,11 +131,11 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse
 		"Lagna": utils.GetHouse(karakamshaReqBody.Karakamsha, karakamshaReqBody.Ascendant),
 	}
 
-	guruAspects := utils.GetGuruAspectRaashis(models.AllRaashis(req.GuruPlacement.Placement))
-	shaniAspects := utils.GetShaniAspectRaashis(models.AllRaashis(req.ShaniPlacement.Placement))
-	navShaniAspects := utils.GetShaniAspectRaashis(models.AllRaashis(req.NavShaniPlacement))
-	kujaAspects := utils.GetKujaAspectRaashis(models.AllRaashis(req.KujaPlacement.Placement))
-	navKujaAspects := utils.GetKujaAspectRaashis(models.AllRaashis(req.NavKujaPlacement))
+	guruAspects := utils.GetGuruAspectRaashis(dto.AllRaashis(req.GuruPlacement.Placement))
+	shaniAspects := utils.GetShaniAspectRaashis(dto.AllRaashis(req.ShaniPlacement.Placement))
+	navShaniAspects := utils.GetShaniAspectRaashis(dto.AllRaashis(req.NavShaniPlacement))
+	kujaAspects := utils.GetKujaAspectRaashis(dto.AllRaashis(req.KujaPlacement.Placement))
+	navKujaAspects := utils.GetKujaAspectRaashis(dto.AllRaashis(req.NavKujaPlacement))
 	// Calculate Mercury affliction.
 	req.BudhaUnafflicted = !isBudhaAfflicted(req,&shaniAspects,&kujaAspects)
 	req.NavBudhaAfflicted = isNavBudhaAfflicted(req,&navShaniAspects,&navKujaAspects)
@@ -164,11 +164,11 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse
 			copy(proportions, constants.SpecialHouseEffectsProportionStore[specialKey])
         }
     } else {
-		copy(proportions, constants.HouseeffectProprtionStore[models.AllRaashis(asc)])
+		copy(proportions, constants.HouseeffectProprtionStore[dto.AllRaashis(asc)])
     }
 
 	// 3. Prepare results
-	var result []models.HouseEffectsWithCommentory
+	var result []dto.HouseEffectsWithCommentory
 	for i := range int8(12) {
         houseNum := i + 1
         proportion := proportions[i]
@@ -177,7 +177,7 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse
 
 			comment := getShadBalaStyleComment(proportion)
 	
-			item := models.HouseEffectsWithCommentory{
+			item := dto.HouseEffectsWithCommentory{
 				HouseNumber: houseNum,
 				Theme:       constants.Themes[i],
 				Comments:    comment,
@@ -196,7 +196,7 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse
 		}
 	}
 
-	otherEffects := services.GeneralEffects(req, &housePlacements, &guruAspects, &shaniAspects, &kujaAspects)
+	otherEffects := houses.GeneralEffects(req, &housePlacements, &guruAspects, &shaniAspects, &kujaAspects)
 
 	var sum int = 0
     for _, v := range proportions {
@@ -214,7 +214,7 @@ func calculateHouseEffects(req *models.HouseEffectsReqBody) HouseEffectsResponse
         ZeroProportion:    zeroProportionHouse,
         Proportions:       percentages,
         GeneralEffects:    otherEffects,
-        KarakamshaResults: ToIndexedStrings(services.KarakamshaEffectsService(&karakamshaHousePlacements, &karakamshaReqBody)),
+        KarakamshaResults: ToIndexedStrings(houses.KarakamshaEffectsService(&karakamshaHousePlacements, &karakamshaReqBody)),
         Horoscope:         req,
     }
 }

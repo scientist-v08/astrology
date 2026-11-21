@@ -2,11 +2,11 @@ package shadbala
 
 import (
 	"github.com/scientist-v08/bphs/constants"
-	"github.com/scientist-v08/bphs/models"
+	"github.com/scientist-v08/bphs/dto"
 )
 
-func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) models.BhavaLordAndShadBalaReqBody {
-	order := []models.Raashyadhipati{
+func ToBhavaLordAndShadBalaReq(houseReq dto.HouseEffectsReqBody, res Result) dto.BhavaLordAndShadBalaReqBody {
+	order := []dto.Raashyadhipati{
 		constants.Surya,
 		constants.Chandra,
 		constants.Kuja,
@@ -23,6 +23,8 @@ func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) 
 
 	sthanaBala := make([]float32, len(order))
 	kaalaBala := make([]float32, len(order))
+	digBala := make([]float32, len(order))
+	chestaBala := make([]float32, len(order))
 	drigBala := make([]float32, len(order))
 	shadBala := make([]float32, len(order))
 
@@ -39,12 +41,14 @@ func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) 
 		shadbalaPercent := (totalShadbala / minRequired[i]) * 100
 
 		sthanaBala[i] = float32(sthana)
+		digBala[i] = float32(dig)
+		chestaBala[i] = float32(chesta)
 		kaalaBala[i] = float32(kaala)
 		drigBala[i] = float32(drig)
 		shadBala[i] = float32(shadbalaPercent)
 	}
 
-	return models.BhavaLordAndShadBalaReqBody{
+	return dto.BhavaLordAndShadBalaReqBody{
 		Ascendant:        houseReq.Ascendant,
 		SuryaPlacement:   houseReq.SuryaPlacement,
 		BudhaPlacement:   houseReq.BudhaPlacement.Placement,
@@ -57,7 +61,11 @@ func ToBhavaLordAndShadBalaReq(houseReq models.HouseEffectsReqBody, res Result) 
 		ShaniPlacement:   houseReq.ShaniPlacement.Placement,
 		SthanaBala:       sthanaBala,
 		KaalaBala:        kaalaBala,
+		DigBala:          digBala,
+		ChestaBala:       chestaBala,
 		DrigBala:         drigBala,
 		ShadBala:         shadBala,
+		SuryaAyana:       res.Kaala.Ayana[constants.Surya],
+		ChandraPaksha:    res.Kaala.Paksha[constants.Chandra],
 	}
 }

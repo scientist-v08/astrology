@@ -1,8 +1,8 @@
 package constants
 
-import "github.com/scientist-v08/bphs/models"
+import "github.com/scientist-v08/bphs/dto"
 
-type AscendantToRashyadhipatiMap map[models.AllRaashis]map[models.Raashyadhipati][]int8
+type AscendantToRashyadhipatiMap map[dto.AllRaashis]map[dto.Raashyadhipati][]int8
 
 var AscendantToRashyadhipatiMapStore = AscendantToRashyadhipatiMap{
 	Mesha: {
