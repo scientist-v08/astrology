@@ -65,6 +65,10 @@ type BhavaLordAndShadBalaReqBody struct {
 	ShaniPlacement   string    `json:"shaniPlacement" binding:"required,raashi"`
 	SthanaBala       []float32 `json:"sthanaBala" binding:"required,len=7"`
 	KaalaBala        []float32 `json:"kaalaBala" binding:"required,len=7"`
+	DigBala          []float32
+	ChestaBala       []float32
 	DrigBala         []float32 `json:"drigBala" binding:"required,len=7"`
 	ShadBala         []float32 `json:"shadBala" binding:"required,len=7"`
+	SuryaAyana       float64
+	ChandraPaksha    float64
 }
