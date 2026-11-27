@@ -34,7 +34,7 @@ It computes planetary positions, house effects, Shadbala, Upagrahas, Karakamsha,
 
 ## Prerequisites
 
-1. **Go** >= 1.25  
+1. **Go** >= 1.27  
    https://go.dev/dl/
 
 2. **C compiler & build tools** (required for CGO)
