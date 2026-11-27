@@ -8,11 +8,6 @@ import (
 	"github.com/scientist-v08/bphs/dto"
 )
 
-type RankedItem struct {
-    idx   int
-    value float32
-}
-
 func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
 	var req dto.SthanaBalaReq
 
@@ -59,18 +54,18 @@ func SthanaBalaOrKaalaBalaCalculator(c *gin.Context) {
 		}
 	}
 
-	items := make([]RankedItem, 7)
+	items := make([]dto.RankedItem, 7)
 	for i := range 7 {
-		items[i] = RankedItem{i, effectiveSthanaBala[i]}
+		items[i] = dto.RankedItem{Idx: i, Value: effectiveSthanaBala[i]}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].value > items[j].value
+		return items[i].Value > items[j].Value
 	})
 
 	// Assign ranks (1 = strongest)
 	for rank, item := range items {
-		allGrahaDefined[item.idx].Rank = int8(rank + 1)
+		allGrahaDefined[item.Idx].Rank = int8(rank + 1)
 	}
 
 	sort.Slice(allGrahaDefined, func(i, j int) bool {
@@ -117,18 +112,18 @@ func AyanaBalaRanks(c *gin.Context) {
 		}
 	}
 
-	items := make([]RankedItem, 7)
+	items := make([]dto.RankedItem, 7)
 	for i := range 7 {
-		items[i] = RankedItem{i, effectiveAyanaBala[i]}
+		items[i] = dto.RankedItem{Idx: i, Value: effectiveAyanaBala[i]}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].value > items[j].value
+		return items[i].Value > items[j].Value
 	})
 
 	// Assign ranks (1 = strongest)
 	for rank, item := range items {
-		allGrahaDefined[item.idx].Rank = int8(rank + 1)
+		allGrahaDefined[item.Idx].Rank = int8(rank + 1)
 	}
 
 	sort.Slice(allGrahaDefined, func(i, j int) bool {
@@ -187,18 +182,18 @@ func DigBalaOrChestaBalaCalculator(c *gin.Context) {
 		}
 	}
 
-	items := make([]RankedItem, 7)
+	items := make([]dto.RankedItem, 7)
 	for i := range 7 {
-		items[i] = RankedItem{i, effectiveSthanaBala[i]}
+		items[i] = dto.RankedItem{Idx: i, Value: effectiveSthanaBala[i]}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].value > items[j].value
+		return items[i].Value > items[j].Value
 	})
 
 	// Assign ranks (1 = strongest)
 	for rank, item := range items {
-		allGrahaDefined[item.idx].Rank = int8(rank + 1)
+		allGrahaDefined[item.Idx].Rank = int8(rank + 1)
 	}
 
 	sort.Slice(allGrahaDefined, func(i, j int) bool {
@@ -296,18 +291,18 @@ func PureShadbalaRank(c *gin.Context) {
 		}
 	}
 
-	items := make([]RankedItem, 7)
+	items := make([]dto.RankedItem, 7)
 	for i := range 7 {
-		items[i] = RankedItem{i, effectiveShadbala[i]}
+		items[i] = dto.RankedItem{Idx: i, Value: effectiveShadbala[i]}
 	}
 
 	sort.Slice(items, func(i, j int) bool {
-		return items[i].value > items[j].value
+		return items[i].Value > items[j].Value
 	})
 
 	// Assign ranks (1 = strongest)
 	for rank, item := range items {
-		allGrahaDefined[item.idx].Rank = int8(rank + 1)
+		allGrahaDefined[item.Idx].Rank = int8(rank + 1)
 	}
 
 	sort.Slice(allGrahaDefined, func(i, j int) bool {

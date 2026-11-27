@@ -6,6 +6,11 @@ type SthanaBalaReq struct {
 	IsSthana                     bool      `json:"isSthana"`
 }
 
+type RankedItem struct {
+	Idx   int
+	Value float32
+}
+
 type DigBalaReq struct {
 	DigbalaOrChestabalaOfGrahas []float32 `json:"digOrChesta" binding:"required"`
 	IsDig                       bool      `json:"isDig"`
