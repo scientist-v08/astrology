@@ -23,7 +23,7 @@ It computes planetary positions, house effects, Shadbala, Upagrahas, Karakamsha,
 
 ## Tech Stack
 
-- **Language:** Go 1.25+
+- **Language:** Go 1.27+
 - **HTTP:** Gin
 - **DB:** PostgreSQL + GORM
 - **Auth:** PASETO (github.com/o1egl/paseto)
